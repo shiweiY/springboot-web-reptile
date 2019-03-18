@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>一键查询</title>
+<link rel="import" href="includers/PageHeader.html" id="pageheader">
+</head>
+<script type="text/javascript">
+	$(document).ready(function() {
+		initPage();
+	});
+</script>
+<body>
+	<div class="filter-box">
+		<div id="search-box" class="search-box">
+			<div id="DivSearchInput" class="input-group col-md-3">
+				<input id="SearchInput" type="text" class="form-control" placeholder="请输入职位名"/ > 
+				<span class="input-group-btn">
+					<button onclick="jobSearch()" class="btn btn-info btn-search">查找</button>
+				</span>
+			</div>
+			<dl class="dl-city">
+				<dd id="hotcity" class="city-wrapper"></dd>
+			</dl>
+			<div id="filter">
+				<div class="col-xs-2 noleft15">
+					<select id="ExpSelect" size="2">
+						<!--<optgroup label="未上线">
+					<option value="0">未排产</option>
+				</optgroup> -->
+						<option value="exp-all">不限</option>
+						<option value="exp-0">应届生</option>
+						<option value="exp-1">1年以内</option>
+						<option value="exp-2">1-3年</option>
+						<option value="exp-3">3-5年</option>
+						<option value="exp-4">5-10年</option>
+						<option value="exp-5">10年以上</option>
+					</select>
+				</div>
+				<div class="col-xs-2 noleft15">
+					<select id="DegreeSelect" size="2">
+						<option value="degree-all">不限</option>
+						<option value="degree-0">初中及以下</option>
+						<option value="degree-1">中专/中技</option>
+						<option value="degree-2">高中</option>
+						<option value="degree-3">大专</option>
+						<option value="degree-4">本科</option>
+						<option value="degree-5">硕士</option>
+						<option value="degree-6">博士</option>
+					</select>
+				</div>
+				<div class="col-xs-2 noleft15">
+					<select id="SalarySelect" size="2">
+						<option value="all">不限</option>
+						<option value="salary-0">3k以下</option>
+						<option value="salary-1">3-5k</option>
+						<option value="salary-2">5-10k</option>
+						<option value="salary-3">10-15k</option>
+						<option value="salary-4">15-20k</option>
+						<option value="salary-5">20-30k</option>
+						<option value="salary-6">30-50k</option>
+						<option value="salary-7">50k以上</option>
+					</select>
+				</div>
+				<div class="col-xs-2 noleft15">
+					<select id="StageSelect" size="2">
+						<option value="all">不限</option>
+						<option value="stage-0">未融资</option>
+						<option value="stage-1">天使轮</option>
+						<option value="stage-2">A轮</option>
+						<option value="stage-3">B轮</option>
+						<option value="stage-4">C轮</option>
+						<option value="stage-5">D轮及以上</option>
+						<option value="stage-6">已上市</option>
+						<option value="stage-7">不需要融资</option>
+					</select>
+				</div>
+				<div class="col-xs-2 noleft15">
+					<select id="ScaleSelect" size="2">
+						<option value="scale-all">不限</option>
+						<option value="scale-0">0-20人</option>
+						<option value="scale-1">20-99人</option>
+						<option value="scale-2">100-499人</option>
+						<option value="scale-3">500-999人</option>
+						<option value="scale-4">1000-9999人</option>
+						<option value="scale-5">10000人以上</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="data-body">
+		<div class="main">
+			
+		</div>
+	</div>
+
+</body>
+</html>
