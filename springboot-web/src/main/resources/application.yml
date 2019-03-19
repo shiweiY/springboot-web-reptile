@@ -1,19 +1,18 @@
 server:
   port: 8081
 
-eureka: 
-  client: 
-    serviceUrl: 
-      defaultZone: http://localhost:8089/eureka/
 spring:
   application: 
-    name: springboot-project-web
-    instance:
-      prefer-ip-address: true
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/reptile?characterEncoding=UTF-8
-    username: root
-    password: root
+    name: project-web
+
+eureka: 
+  client: 
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl: 
+      defaultZone: http://localhost:8089/eureka/
     
+ribbon:
+  eureka:
+    enabled: true
     

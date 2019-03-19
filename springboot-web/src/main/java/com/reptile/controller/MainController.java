@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.reptile.service.ReptileBossJobService;
 
@@ -17,14 +16,23 @@ class MainController{
 	@Autowired
 	ReptileBossJobService rbs;
 	
-	@Autowired
-	private RestTemplate restTemplate;
 	
 	@GetMapping("/searchJob")
 	public <T> List<T> search(){
 		
-//		List<T> list = rbs.getBossPageJob("");
-		String list = this.restTemplate.getForObject("http://boss-reptile-server//main/searchJob", String.class).toString();
+//		Long start = System.currentTimeMillis();
+		
+		List<T> list = rbs.getBossPageJob("");
+		
+//		Long end = System.currentTimeMillis();
+		
+//		double time = end - start;
+//		
+//		System.out.println("服务响应时间: "+ time / 1000);
+
+//		String str = rbs.getStringData();
+		
+		System.out.println(list);
 		
 		return null;
 	}

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,13 @@ public class BossController {
 	@Autowired
 	BossPageService pageService;
 	
-	@GetMapping("/getPageJob")
+	@GetMapping("/getStr")
+	public String getStringData() {
+		
+		return "hello spring";
+	}
+	
+	@PostMapping("/getPageJob")
 	public List<Job> getJobPage(String url) {
 		
 		String result = "";
@@ -52,13 +59,9 @@ public class BossController {
 				//业务层爬去页面职位数据
 				jobList = pageService.getJobList(result);
 				
-				
-				
 			}else {
 				log.warn("GET 请求页面时失败！ 错误代码 ："+response.getStatusLine().getStatusCode());
 			}
-			
-			
 			
 			
 		} catch (Exception e) {

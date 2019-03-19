@@ -11,7 +11,6 @@ function jobSearch(){
 	$.ajax({
 		type:"get",
 		url:"/main/searchJob",
-		data:param,
 		dataType:"json",
 		async:true,
 		success:function(data,flag){

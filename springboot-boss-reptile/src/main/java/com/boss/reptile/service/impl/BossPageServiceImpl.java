@@ -7,15 +7,33 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.boss.reptile.model.Company;
 import com.boss.reptile.model.Job;
 import com.boss.reptile.service.BossPageService;
 
+/***
+ * 
+ *  <br>Boss直聘 页面数据爬取及处理
+ *  <br>数据爬取使用Jsoup
+ * 
+ * @author yangsw
+ *
+ */
+
 @Service("pageService")
 public class BossPageServiceImpl implements BossPageService {
+	Logger log = LoggerFactory.getLogger(BossPageServiceImpl.class);
 
+
+	/***
+	 * 解析页面Document 获取页面的职位及公司信息
+	 * 
+	 * @param pageDoc 被转化为String的Document对象
+	 */
 	@Override
 	public List<Job> getJobList(String pageDoc) {
 
@@ -52,13 +70,13 @@ public class BossPageServiceImpl implements BossPageService {
 			String job_exp = p_arr[1];
 
 			String job_degree = p_arr[2].substring(0, p_arr[2].length()-4);
-			
-			
+
+
 			/***
 			 * 职位发布时间 所在的div
 			 */
 			Element info_publis = jobEle.getElementsByClass("info-publis").first();
-			
+
 			String job_time = info_publis.getElementsByTag("p").first().html();
 
 
@@ -70,7 +88,7 @@ public class BossPageServiceImpl implements BossPageService {
 
 			String company_name = company_a_tag.html();
 			String company_link = company_a_tag.attr("href");
-			
+
 			Element company_p = info_company.getElementsByTag("p").first();//公司信息的p标签
 
 			String[] p_arr2 = company_p.toString().split(regex);//分割p中的信息
@@ -80,10 +98,10 @@ public class BossPageServiceImpl implements BossPageService {
 			String company_stage = p_arr2[1];//融资阶段
 
 			String company_scale = p_arr2[2].substring(0, p_arr2[2].length()-4);//公司规模
-			
-			
+
+
 			Company cpany = new Company(String.valueOf(i),company_name,company_link,company_type,company_stage,company_scale);
-			
+
 			Job job = new Job(job_title,job_salary,job_address,job_exp,job_degree,job_time,job_link,cpany);
 
 
