@@ -17,7 +17,7 @@
 	</properties>
 
 	<dependencies>
-		<!-- springboot 基本依赖 --> 
+		<!-- springboot 基本依赖 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -30,7 +30,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-		
+
 		<!-- springcloud 及 Eureka服务端客服端依赖 -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -43,6 +43,12 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
 

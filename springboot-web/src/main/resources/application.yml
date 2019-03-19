@@ -4,6 +4,18 @@ server:
 spring:
   application: 
     name: project-web
+  redis:
+     host: 127.0.0.1
+     port: 6379
+     timeout: 30000
+#    cluster: 
+#         nodes: 
+#         maxRedirects:
+     pool:
+        max-active: 8
+        min-idle: 0
+        max-idle: 8
+        max-wait: -1
 
 eureka: 
   client: 
