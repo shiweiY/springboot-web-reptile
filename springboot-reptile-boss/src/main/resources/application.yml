@@ -7,9 +7,5 @@ eureka:
     serviceUrl: 
       defaultZone: http://localhost:8089/eureka/
 spring:
-  cloud:
-    config:
-      discovery:
-        serviceId: bossreptile-service
   application: 
     name: boss-service

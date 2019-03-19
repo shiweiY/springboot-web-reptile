@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.reptile</groupId>
-	<artifactId>springboot-boss-reptile</artifactId>
+	<artifactId>springboot-reptile-boss</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>springboot-boss-reptile</name>
+	<name>springboot-reptile-boss</name>
 	<url>http://maven.apache.org</url>
 
 	<parent>

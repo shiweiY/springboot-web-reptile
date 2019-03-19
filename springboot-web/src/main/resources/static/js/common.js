@@ -180,7 +180,7 @@ function getSerialData(key){
 	var result;
 	if(key != null){
 		$.ajax({
-			type : "post",
+			type : "get",
 			url : "TransientData/getSerialData",
 			data : {params:key},
 			dataType : "json",
