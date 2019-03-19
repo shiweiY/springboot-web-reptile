@@ -1,4 +1,4 @@
-package com.boss.reptile.model;
+package com.reptile.boss.model;
 
 public class Company {
 	private String id;

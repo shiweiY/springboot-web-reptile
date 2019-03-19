@@ -1,4 +1,4 @@
-package com.boss.reptile.service.impl;
+package com.reptile.boss.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.boss.reptile.model.Company;
-import com.boss.reptile.model.Job;
-import com.boss.reptile.service.BossPageService;
+import com.reptile.boss.model.Company;
+import com.reptile.boss.model.Job;
+import com.reptile.boss.service.BossPageService;
+
 
 /***
  * 

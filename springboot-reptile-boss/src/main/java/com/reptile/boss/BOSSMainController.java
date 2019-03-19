@@ -1,4 +1,4 @@
-package com.boss.reptile;
+package com.reptile.boss;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

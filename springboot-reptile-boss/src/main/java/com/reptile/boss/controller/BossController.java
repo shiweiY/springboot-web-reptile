@@ -1,4 +1,4 @@
-package com.boss.reptile.controller;
+package com.reptile.boss.controller;
 
 import java.util.List;
 
@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boss.reptile.model.Job;
-import com.boss.reptile.service.BossPageService;
-import com.boss.reptile.utils.HttpClientUtil;
-import com.boss.reptile.utils.IOUtil;
+import com.reptile.boss.model.Job;
+import com.reptile.boss.service.BossPageService;
+import com.reptile.boss.utils.HttpClientUtil;
+import com.reptile.boss.utils.IOUtil;
+
 
 @RestController()
 @RequestMapping(value = "/boss")

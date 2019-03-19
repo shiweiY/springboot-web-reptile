@@ -1,4 +1,4 @@
-package com.boss.reptile.service;
+package com.reptile.boss.service;
 
 import java.util.List;
 

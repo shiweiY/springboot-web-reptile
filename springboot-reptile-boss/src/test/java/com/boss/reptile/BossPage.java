@@ -14,7 +14,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
-import com.boss.reptile.utils.IOUtil;
+import com.reptile.boss.utils.IOUtil;
+
 
 public class BossPage {
 	
