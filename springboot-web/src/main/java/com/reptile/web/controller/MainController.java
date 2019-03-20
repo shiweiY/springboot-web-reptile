@@ -1,14 +1,19 @@
 package com.reptile.web.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.reptile.cache.service.RedisHelper;
+import com.reptile.web.model.JSONReturn;
 import com.reptile.web.service.ReptileBossJobService;
 
 @RestController
@@ -16,33 +21,29 @@ import com.reptile.web.service.ReptileBossJobService;
 class MainController{
 	
 	@Autowired
-	ReptileBossJobService rbs;
+	ReptileBossJobService boss_service;
 	
 	@Autowired
 	RedisHelper redis;
 	
 	@GetMapping("/searchJob")
-	public String search(){
+	public JSONReturn search(){
 		
-//		Long start = System.currentTimeMillis();
 		
-		List<Job> list = rbs.getBossPageJob("");
+		List<Object> list = boss_service.getBossPageJob("");
 		
-//		Long end = System.currentTimeMillis();
+		JSONReturn Jmodel =new JSONReturn();
+		if(list != null && !list.isEmpty()) {
+			Jmodel.setListData(list);
+		}
 		
-//		double time = end - start;
-//		
-//		System.out.println("服务响应时间: "+ time / 1000);
-
-//		String str = rbs.getStringData();
+		Jmodel.setFlag(true);
 		
-//		System.out.println(list);
+		redis.listSet("boss_job_data", list);
 		
-		redis.listSet("bossjoblist", list);
+		List<Object> list2 = redis.listGet("boss_job_data");
 		
-		System.out.println(redis.listGet("joblist"));
-		
-		return "ok";
+		return Jmodel;
 	}
 	
 }

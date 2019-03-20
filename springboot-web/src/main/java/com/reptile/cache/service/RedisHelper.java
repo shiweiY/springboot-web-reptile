@@ -132,7 +132,7 @@ public class RedisHelper implements CacheManager{
 	@Override
 	public boolean listSet(String key, Object value) {
 		try {
-			redisTemplate.opsForList().rightPush(key, value);
+			redisTemplate.opsForList().leftPush(key, value);
 
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -145,7 +145,7 @@ public class RedisHelper implements CacheManager{
 	public boolean listSet(String key, Object value, long time) {
 		try {
 
-			redisTemplate.opsForList().rightPush(key, value);
+			redisTemplate.opsForList().leftPush(key, value);
 			if(time > 0) {
 				expire(key, time);
 			}
@@ -167,7 +167,7 @@ public class RedisHelper implements CacheManager{
 	public List<Object> listGet(String key) {
 		try {
 			//0和-1表示从0下标到最大下标，也就是整个List 				 range(String key, long start, long end)
-			return (List<Object>) redisTemplate.opsForList().range(key, 0, -1);
+			return (List<Object>) redisTemplate.opsForList().leftPop(key);
 
 		}catch (Exception e) {
 			e.printStackTrace();

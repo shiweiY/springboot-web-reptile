@@ -1,7 +1,9 @@
 $(document).ready(function() {
 	
 	/**
-	 * common.js中动态添加的元素无法用click直接绑定，使用on进行绑定
+	 * 处理页面上方条件中的城市tag
+	 * 
+	 * common.js中动态添加的元素无法用click直接绑定，使用on从父标签开始绑定
 	 * 
 	 * 点击程式label时标红，再点击另一个label时取消之前label的标红，将当前点击的标红
 	 */
@@ -31,6 +33,28 @@ $(document).ready(function() {
 	});
 	
 	
+	/***
+	 * 左方附加导航栏点击时的active切换及事件
+	 */
+	$("#affixul").on("click","a[name='left_affix']",function(){
+		
+		var hasclass = $(this).parent().hasClass("active");
+		
+		if(hasclass == false){
+			var liEle = $("#affixul").children();
+			$.each(liEle,function(i,li){
+				if($(this).hasClass("active") == true){
+					$(this).removeClass("active");
+				}
+			});
+			
+			$(this).parent().addClass("active");
+		}
+		
+		//调用方法切换右方的数据显示
+		changeJobData(this.id);
+		
+	});
 	
 	
 	
@@ -38,8 +62,9 @@ $(document).ready(function() {
 	
 	
 	
-	
-	//下拉选组件初始化
+	/***
+	 * 下拉选组件初始化
+	 */
 	$("#ExpSelect").multiselect({
 		nonSelectedText: "工作经验",
 		buttonWidth:139,
