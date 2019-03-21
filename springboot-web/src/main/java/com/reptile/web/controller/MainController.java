@@ -41,7 +41,7 @@ class MainController{
 		
 		redis.listSet("boss_job_data", list);
 		
-		List<Object> list2 = redis.listGet("boss_job_data");
+//		List<Object> list2 = redis.listGet("boss_job_data");
 		
 		return Jmodel;
 	}

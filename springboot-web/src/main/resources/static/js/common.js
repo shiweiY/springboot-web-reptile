@@ -44,11 +44,43 @@ function jobSearch(){
  * 
  * @author yangsw
  */
-function changeJobData(id){
+function changeJobData(idkey){
 	debugger;
-	$("#"+id).parent().addClass("active");
-	var joblist = getSerialListData(id);
-	
+	$("#"+idkey).parent().addClass("active");
+	var joblist = getSerialListData(idkey);//获取数据
+
+	if(joblist != null){
+
+		var job_start_tag = "";
+		var info_title_tag = "";
+		var job_salary_address_tag = "";
+		var company_start_tag = "";
+		var company_tag = "";
+		var company_info_tag = "";
+
+		$.each(joblist,function(i,job){
+			if(i < 10){
+				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
+				info_title_tag = "<div class=\"info-title\"><a class=\"cursortag\" link=\""+job.job_link+"\">"+job.title+"</a>"+
+					"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
+
+				job_salary_address_tag = "<div class=\"job-salary\">"+job.salary+"<span class=\"job-address\">"+job.address+"</span></div></div>";
+
+				company_start_tag = "<div class=\"job-company\">";
+				company_tag = "<div class=\"info-title-right\"><a class=\"cursortag\" link=\""+job.company.link+"\">"+job.company.name+"</a>" +
+					"<span class=\"typeword\">"+job.job_time+"</span></div>";
+				company_info_tag = "<div class=\"company-info\"><span >"+job.company.type+"<em class=\"vline\"></em>"+job.company.stage+"<em class=\"vline\">" +
+					"</em>"+job.company.scale+"</span></div></div></div>";
+
+				$("#joblist").append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
+
+			}else{
+				return false;
+			}
+		});
+	}
+
+
 }
 
 
@@ -90,13 +122,13 @@ function initPageData(){
  * @author yangsw
  */
 function pageAffixAppend(){
-	
+
 	var li_boss = "<li><a id=\"boss_job_data\" class=\"cursortag\" name=\"left_affix\" >Boss直聘</a></li>";
 	var li_zhilian = "<li><a id=\"zhilian_job_data\" class=\"cursortag\" name=\"left_affix\" >智联招聘</a></li>";
 	var li_51 = "<li><a id=\"51_job_data\" class=\"cursortag\" name=\"left_affix\" >51job</a></li>";
-	
+
 	$("#affixul").append(li_boss+li_zhilian+li_51);
-	
+
 }
 
 
