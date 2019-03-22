@@ -1,6 +1,8 @@
 package com.reptile.cache.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -16,15 +18,19 @@ import com.reptile.web.model.JSONReturn;
 @RequestMapping("/TransientData")
 public class TransientDataController {
 	
-	@Autowired
-	RedisHelper redis;
+//	@Autowired
+//	RedisHelper redis;
 	
-	@GetMapping(value = "/getSerialListData")
+	@GetMapping(value = "/getSerialData")
 	public JSONReturn getSerialData(@RequestParam("rediskey") String rediskey) {
 		JSONReturn Jmodel =new JSONReturn();
-		List<Object> list = redis.listGet(rediskey);
 		
-		Jmodel.setListData(list);
+		Object obj = RedisHelper.getSerialData(rediskey);
+		
+		Map<String,Object> resultMap = new HashMap<>();
+		resultMap.put("result", obj);
+		Jmodel.setMapData(resultMap);
+		Jmodel.setFlag(true);
 		
 		return Jmodel;
 	}

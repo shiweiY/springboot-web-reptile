@@ -1,9 +1,8 @@
 @charset "UTF-8";
 
-a{
+a {
 	text-decoration: none;
 }
-
 
 #DivSearchInput {
 	margin: 0 auto;
@@ -48,7 +47,7 @@ a{
 .data-body {
 	padding-top: 30px;
 	margin: 0 auto;
-	width: 1000px;
+	width: 900px;
 	overflow: visible;
 	float: left;
 }
@@ -62,7 +61,7 @@ a{
 
 .job-item {
 	/* border: 1px solid red; */
-	border-radius:15px;
+	border-radius: 15px;
 	background-color: #F0F0F0;
 	margin-bottom: 5px;
 	padding: 8px 20px 10px 20px;
@@ -70,69 +69,72 @@ a{
 	height: 55px;
 }
 
-.job-info{
-	float:left;
+.job-info {
+	float: left;
 }
 
-.info-title a{
+.info-title a {
 	font-size: 16px;
 	color: #ce9c0b;
 }
 
-.info-title-right{
-	text-align:right;
+.info-title-right {
+	text-align: right;
 }
 
-.info-title-right a{
+.info-title-right a {
 	font-size: 16px;
 	color: #ce9c0b;
 }
 
-.job-salary{
+.job-salary {
 	color: #CD0000;
 	font-size: 18px;
 }
 
-.job-exp-degree{
+.job-exp-degree {
 	color: #8F8F8F;
 	margin: 5px 0px 0px 20px;
 	font-size: 12px;
 }
-.job-address{
+
+.job-address {
 	color: #8F8F8F;
 	margin: 8px 0px 0px 20px;
 	font-size: 10px;
 }
 
-.job-company{
+.job-company {
 	float: right;
 }
 
-.company-info{
+.company-info {
 	color: #8F8F8F;
 	margin: 8px 0px 0px 20px;
 	font-size: 10px;
 }
 
-.typeword{
+.typeword {
 	color: #515151;
 	font-size: 12px;
 }
 
 .vline {
-    display: inline-block;
-    width: 1px;
-    height: 12px;
-    vertical-align: middle;
-    background: #8B8989;
-    margin: 0 10px;
+	display: inline-block;
+	width: 1px;
+	height: 12px;
+	vertical-align: middle;
+	background: #8B8989;
+	margin: 0 10px;
 }
 
-
-
-
-
-
+.paginationBox {
+	text-align: center;
+	margin: 0 auto;
+}
+.paginationForMarginTop {
+	margin: 10px 0 !important;
+}
 
 
 

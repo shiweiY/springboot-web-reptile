@@ -23,8 +23,9 @@ class MainController{
 	@Autowired
 	ReptileBossJobService boss_service;
 	
-	@Autowired
-	RedisHelper redis;
+	//不再使用springboot 集成的redis
+//	@Autowired
+//	RedisHelper redis;
 	
 	@GetMapping("/searchJob")
 	public JSONReturn search(){
@@ -35,13 +36,15 @@ class MainController{
 		JSONReturn Jmodel =new JSONReturn();
 		if(list != null && !list.isEmpty()) {
 			Jmodel.setListData(list);
+			RedisHelper.setSerialData("boss_job_data", list);
+			Jmodel.setFlag(true);
+		}else {
+			Jmodel.setFlag(false);
+			Jmodel.setMessage("Boss 直聘,职位数据爬去失败");
 		}
 		
-		Jmodel.setFlag(true);
 		
-		redis.listSet("boss_job_data", list);
-		
-//		List<Object> list2 = redis.listGet("boss_job_data");
+		List<Object> list2 = (List<Object>) RedisHelper.getSerialData("boss_job_data");
 		
 		return Jmodel;
 	}

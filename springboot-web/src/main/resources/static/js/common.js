@@ -30,7 +30,7 @@ function jobSearch(){
 		async:true,
 		success:function(data,flag){
 			if(data.listData != null && data.listData.length > 0 ){
-				changeJobData('boss_job_data');//显示数据，默认显示Boss直聘页面
+				changeJobData('boss_job_data',1);//显示数据，默认显示Boss直聘页面
 			}else{
 				alert("查询异常，请稍后再试！");
 			}
@@ -43,11 +43,14 @@ function jobSearch(){
  * 附加导航栏位点击时右方的数据切换
  * 
  * @author yangsw
+ * @param idkey 附加导航栏的id,也是redis中数据的key
+ * @param defaultNum 默认显示第几页数据
  */
-function changeJobData(idkey){
-	debugger;
-	$("#"+idkey).parent().addClass("active");
+function changeJobData(idkey,defaultNum){
+
 	var joblist = getSerialListData(idkey);//获取数据
+	var length = joblist.length;
+	var pageNum = Math.ceil(length/10);//页数
 
 	if(joblist != null){
 
@@ -57,27 +60,37 @@ function changeJobData(idkey){
 		var company_start_tag = "";
 		var company_tag = "";
 		var company_info_tag = "";
+		
+		//数据分页
+		var pageBegin = (defaultNum-1)*10;
+		var pageEnd = defaultNum * 10;
 
+		$("#joblist").empty();
 		$.each(joblist,function(i,job){
-			if(i < 10){
+			if(i >= pageBegin && i < pageEnd){
 				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
 				info_title_tag = "<div class=\"info-title\"><a class=\"cursortag\" link=\""+job.job_link+"\">"+job.title+"</a>"+
-					"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
+				"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
 
 				job_salary_address_tag = "<div class=\"job-salary\">"+job.salary+"<span class=\"job-address\">"+job.address+"</span></div></div>";
 
 				company_start_tag = "<div class=\"job-company\">";
 				company_tag = "<div class=\"info-title-right\"><a class=\"cursortag\" link=\""+job.company.link+"\">"+job.company.name+"</a>" +
-					"<span class=\"typeword\">"+job.job_time+"</span></div>";
+				"<span class=\"typeword\">"+job.job_time+"</span></div>";
 				company_info_tag = "<div class=\"company-info\"><span >"+job.company.type+"<em class=\"vline\"></em>"+job.company.stage+"<em class=\"vline\">" +
-					"</em>"+job.company.scale+"</span></div></div></div>";
+				"</em>"+job.company.scale+"</span></div></div></div>";
 
 				$("#joblist").append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
 
-			}else{
-				return false;
+				//附加菜单选中
+				$("#"+idkey).parent().addClass("active");
+
 			}
 		});
+
+		paginationAppend(pageNum);
+
+
 	}
 
 
@@ -131,6 +144,28 @@ function pageAffixAppend(){
 
 }
 
+/***
+ * 页码分页动态添加
+ */
+function paginationAppend(pageNum){
+	var li_a_start = "";
+
+	if(pageNum > 1){
+		$("#pagination").empty();
+		for (var i = 0; i <= pageNum+1; i++) {
+			if(i == 0){
+				li_a_start += "<li ><a id=\"pagination_a\" class=\"cursortag\">&laquo;</a></li>";
+			}else if(i == pageNum+1){
+				li_a_start += "<li><a id=\"pagination_a\" class=\"cursortag\">&raquo;</a></li>";
+			}else{
+				li_a_start += "<li><a id=\"pagination_a_"+i+"\" class=\"cursortag\">"+i+"</a></li>";
+			}
+		}
+		$("#pagination").append(li_a_start);
+		$("#pagination_a_1").parent().addClass("active");
+	}
+
+}
 
 
 
@@ -142,7 +177,7 @@ function pageAffixAppend(){
  * 与后端数据交互部分-----------------------------------------------------------------------------------
  * 
  * 
- * 获取redis中的List数据
+ * 获取redis中的数据
  * @param key 键
  * @returns json
  * @author yangsw
@@ -152,13 +187,13 @@ function getSerialListData(key){
 	if(key != null){
 		$.ajax({
 			type : "get",
-			url : "TransientData/getSerialListData",
+			url : "TransientData/getSerialData",
 			data : {rediskey:key},
 			dataType : "json",
 			traditional:true,//通过ajax提交数组时，jquery深度序列化以适应php等,它会自动在所设定的参数后面增加中括号： [] 后台取值不便,traditional为true可防止深度序列化
 			async : false,
 			success:function(data,flag){
-				result = data.listData;
+				result = data.mapData.result;
 			}
 		});
 	}
