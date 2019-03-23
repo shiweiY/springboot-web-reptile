@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name="boss-service")
 public interface ReptileBossJobService {
@@ -14,6 +15,6 @@ public interface ReptileBossJobService {
 	public String getStringData();
 	
 	@RequestMapping(value = "/boss/getPageJob",method = RequestMethod.POST)
-	public <T> List<T> getBossPageJob(String condition);
+	public <T> List<T> getBossPageJob(@RequestParam("condition") String condition);
 	
 }

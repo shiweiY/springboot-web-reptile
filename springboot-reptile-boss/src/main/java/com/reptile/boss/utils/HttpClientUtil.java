@@ -26,13 +26,13 @@ public class HttpClientUtil {
 	 * @return CloseableHttpResponse response
 	 * @throws Exception
 	 */
-	public static CloseableHttpResponse sendHttpGet(String uriget) throws Exception {
+	public static CloseableHttpResponse sendHttpGet(String uriget,String user_agent) throws Exception {
 		URIBuilder ubuilder = new URIBuilder(ADDRESS+uriget);
 		
 		URI uri = ubuilder.build();
 		
 		//整理请求头
-		List<Header> lheader = getListHeader(uriget);
+		List<Header> lheader = getListHeader(uriget,user_agent);
 		
 		HttpGet doGet = new HttpGet(uri);
 		for (Header header : lheader) {
@@ -51,7 +51,7 @@ public class HttpClientUtil {
 	 * @param String 
 	 */
 	
-	public static List<Header> getListHeader(String uri) {
+	public static List<Header> getListHeader(String uri,String user_agent) {
 		List<Header> lheader = new ArrayList<Header>();
 		lheader.add(new BasicHeader(HttpHeaders.ACCEPT,"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"));
 		lheader.add(new BasicHeader(HttpHeaders.ACCEPT_ENCODING,"gzip, deflate, br"));
@@ -65,7 +65,8 @@ public class HttpClientUtil {
 		//			lheader.add(new BasicHeader(HttpHeaders.HOST,"60.250.147.59"));
 		//			lheader.add(new BasicHeader("Origin","http://60.250.147.59"));
 		lheader.add(new BasicHeader(HttpHeaders.REFERER,ADDRESS+uri));
-		lheader.add(new BasicHeader(HttpHeaders.USER_AGENT,"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"));
+		
+		lheader.add(new BasicHeader(HttpHeaders.USER_AGENT,user_agent));
 		lheader.add(new BasicHeader("DNT","1"));
 		
 		return lheader;

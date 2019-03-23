@@ -30,21 +30,29 @@ class MainController{
 	@GetMapping("/searchJob")
 	public JSONReturn search(){
 		
+		long start = System.currentTimeMillis();
 		
-		List<Object> list = boss_service.getBossPageJob("");
+		List<Object> list = boss_service.getBossPageJob("/c101010100/y_4-d_206-e_103/?ka=sel-salary-4");
 		
 		JSONReturn Jmodel =new JSONReturn();
 		if(list != null && !list.isEmpty()) {
-			Jmodel.setListData(list);
+			
+			Map<String,Object> resultMap = new HashMap<>();
+			resultMap.put("list", list);
+			Jmodel.setMapData(resultMap);
 			RedisHelper.setSerialData("boss_job_data", list);
 			Jmodel.setFlag(true);
 		}else {
 			Jmodel.setFlag(false);
 			Jmodel.setMessage("Boss 直聘,职位数据爬去失败");
 		}
+		long end = System.currentTimeMillis();
 		
+		long num = end - start;
+		double sum = num / 1000d;
 		
-		List<Object> list2 = (List<Object>) RedisHelper.getSerialData("boss_job_data");
+		Jmodel.setMessage("后端爬取及处理时间："+sum);
+//		List<Object> list2 = (List<Object>) RedisHelper.getSerialData("boss_job_data");
 		
 		return Jmodel;
 	}

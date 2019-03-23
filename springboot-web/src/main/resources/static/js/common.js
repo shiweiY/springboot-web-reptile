@@ -29,7 +29,8 @@ function jobSearch(){
 		dataType:"json",
 		async:true,
 		success:function(data,flag){
-			if(data.listData != null && data.listData.length > 0 ){
+			if(data.mapData.list != null && data.mapData.list.length > 0 ){
+				console.log(data.message);
 				changeJobData('boss_job_data',1);//显示数据，默认显示Boss直聘页面
 			}else{
 				alert("查询异常，请稍后再试！");
@@ -65,7 +66,7 @@ function changeJobData(idkey,defaultNum){
 		var pageBegin = (defaultNum-1)*10;
 		var pageEnd = defaultNum * 10;
 
-		$("#joblist").empty();
+		$("#joblist").empty();//数据变更前先清空数据div
 		$.each(joblist,function(i,job){
 			if(i >= pageBegin && i < pageEnd){
 				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
@@ -88,6 +89,7 @@ function changeJobData(idkey,defaultNum){
 			}
 		});
 
+		//分页栏位显示
 		paginationAppend(pageNum);
 
 
