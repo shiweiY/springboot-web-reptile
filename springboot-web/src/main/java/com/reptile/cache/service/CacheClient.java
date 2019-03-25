@@ -21,6 +21,9 @@ public class CacheClient implements CacheManager {
 		this.jedisPool = jedisPool;
 	}
 
+	/***
+	 * 普通数据放入
+	 */
 	public String setString(String key, String value) {
 		Jedis jedis = getJedis();
 
@@ -40,6 +43,9 @@ public class CacheClient implements CacheManager {
 		return null;
 	}
 
+	/***
+	 * 普通数据取出
+	 */
 	public String getString(String key) {
 		String value= "";
 		if(!key.isEmpty()) {
@@ -59,6 +65,9 @@ public class CacheClient implements CacheManager {
 
 
 
+	/***
+	 * Obj数据放入
+	 */
 	public void setSerialData(String key, Object value) {
 		Jedis jedis = null;
 		if(!key.isEmpty()) {
@@ -77,6 +86,9 @@ public class CacheClient implements CacheManager {
 
 	}
 
+	/***
+	 * Obj数据取出
+	 */
 	public Object getSerialData(String key) {
 		Jedis jedis = null;
 		Object obj = null;
@@ -85,9 +97,55 @@ public class CacheClient implements CacheManager {
 			try {
 				jedis = this.getJedis();
 				byte[] bt = jedis.get(key.getBytes());
-				
+
 				obj = unserialize(bt);
-				
+
+			} finally {
+				if(jedis != null) {
+					jedis.close();
+					flag = false;
+				}
+			}
+		}
+
+		return obj;
+	}
+
+
+	/***
+	 * redis Hash类型数据放入
+	 * @param key 键
+	 * @param field 域
+	 * @param value 值
+	 */
+	public void hset(String key, String field, String value) {
+		Jedis jedis = null;
+		if(checkIsNull(key,field,value)) {
+			try {
+				jedis = this.getJedis();
+				jedis.hset(key, field, value);
+
+			} finally {
+				if(jedis != null) {
+					jedis.close();
+					flag = false;
+				}
+			}
+		}
+	}
+	
+	/***
+	 * redis Hash类型数据取出
+	 * @param key 键
+	 * @param field 域
+	 * @return String 
+	 */
+	public String hget(String key, String field) {
+		Jedis jedis = null;
+		if(checkIsNull(key,field)) {
+			try {
+				jedis = this.getJedis();
+				return jedis.hget(key, field);
 			} finally {
 				if(jedis != null) {
 					jedis.close();
@@ -96,13 +154,23 @@ public class CacheClient implements CacheManager {
 			}
 		}
 		
-		return obj;
+		return "";
 	}
 
 
-
-
-
+	/***
+	 * 判断值是否为空
+	 * @param strs
+	 * @return 为空则返回false
+	 */
+	public boolean checkIsNull(Object... obj) {
+		for (Object string : obj) {
+			if(string == null || string.toString().isEmpty()) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 
 

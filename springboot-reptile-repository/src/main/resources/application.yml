@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8088
 eureka: 
   client: 
     registerWithEureka: true
@@ -11,7 +11,7 @@ spring:
 #  refresh:
 #    refreshable: none
   application: 
-    name: boss-service
+    name: repository-service
   datasource: 
     url: jdbc:mysql://localhost:3306/reptiledatabase?useUnicode=true&characterEncoding=utf8
     username: root

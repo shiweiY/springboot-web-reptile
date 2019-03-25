@@ -49,9 +49,9 @@ function jobSearch(){
  */
 function changeJobData(idkey,defaultNum){
 
-	var joblist = getSerialListData(idkey);//获取数据
+	var joblist = getSerialData(idkey);//获取数据
 	var length = joblist.length;
-	var pageNum = Math.ceil(length/10);//页数
+	var pageNum = Math.ceil(length/10);//页数,获取此值也为了下方分页按钮的动态生成
 
 	if(joblist != null){
 
@@ -89,9 +89,11 @@ function changeJobData(idkey,defaultNum){
 			}
 		});
 
-		//分页栏位显示
-		paginationAppend(pageNum);
-
+		//页面是否已经生成过分页按钮, 只是为了切换分页数据，则下方分页按钮不再生成
+		if($("#pagination:has(li)").length==0){
+			//动态拼接分页栏位显示
+			paginationAppend(pageNum);
+		}
 
 	}
 
@@ -107,7 +109,7 @@ function changeJobData(idkey,defaultNum){
  */
 
 function initPage(){
-//	initPageData();
+	initPageData();
 	pageAffixAppend();
 }
 
@@ -116,14 +118,14 @@ function initPage(){
  * @author yangsw
  */
 function initPageData(){
-	var result = getSerialListData('mainPage_hotcity');
-	var hotcity = result.mainPage_hotcity;
+	var hotcity = getSerialData('mainPage_hotcity');
+//	var hotcity = result.mainPage_hotcity;
 	if(hotcity != null){
 
 		var taghtml = "<span class=\"label label-success\">热门城市: </span>&nbsp;";
 		$("#hotcity").append(taghtml);
-		$.each(hotcity,function(i,city){
-			taghtml = "<span name=\"cityspan\" class=\"cursortag label label-success\">"+city.hc_name+"</span>&nbsp;";
+		$.each(hotcity,function(i,cityname){
+			taghtml = "<span name=\"cityspan\" class=\"cursortag label label-success\">"+cityname+"</span>&nbsp;";
 			$("#hotcity").append(taghtml);
 		});
 		var morecity = "<span  class=\"cursortag label label-warning\" data-toggle=\"tooltip\"  title=\"可以选择更多城市\">更多城市</span>";
@@ -163,9 +165,10 @@ function paginationAppend(pageNum){
 				li_a_start += "<li><a id=\"pagination_a_"+i+"\" class=\"cursortag\">"+i+"</a></li>";
 			}
 		}
-		$("#pagination").append(li_a_start);
-		$("#pagination_a_1").parent().addClass("active");
 	}
+	
+	$("#pagination").append(li_a_start);
+	$("#pagination_a_1").parent().addClass("active");
 
 }
 
@@ -184,7 +187,7 @@ function paginationAppend(pageNum){
  * @returns json
  * @author yangsw
  */
-function getSerialListData(key){
+function getSerialData(key){
 	var result;
 	if(key != null){
 		$.ajax({

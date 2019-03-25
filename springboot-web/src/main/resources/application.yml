@@ -11,10 +11,17 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl: 
-#      defaultZone: http://localhost:8089/eureka/
-       defaultZone: http://192.168.0.113:8089/eureka/
+       defaultZone: http://localhost:8089/eureka/
+#       defaultZone: http://192.168.0.113:8089/eureka/
     
 ribbon:
   eureka:
     enabled: true
-    
+
+feign:
+  client:
+    default:
+      #这里时间一定要调长，否则feign客户端会报ReadTimeOut  服务端报Error parsing HTTP request header
+      connectTimeout: 30000
+      readTimeout: 30000
+      loggerLevel: basic

@@ -46,6 +46,9 @@ $(document).ready(function() {
 
 	});
 
+	/**
+	 * 页面下方分页按钮点击函数
+	 */
 	$("#pagination").on("click","a",function(){
 
 		//动态切换点击时候的显示状态
@@ -53,8 +56,6 @@ $(document).ready(function() {
 
 		//点击的页码
 		var pageNum = $(this).html();
-		
-		debugger;
 		
 		//左侧导航栏位选中的数据方
 		var idkey = "";

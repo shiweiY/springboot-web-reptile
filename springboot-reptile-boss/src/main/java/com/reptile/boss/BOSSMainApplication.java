@@ -6,8 +6,8 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @EnableEurekaClient
 @SpringBootApplication
-public class BOSSMainController {
+public class BOSSMainApplication {
     public static void main( String[] args ){
-    	SpringApplication.run(BOSSMainController.class, args);
+    	SpringApplication.run(BOSSMainApplication.class, args);
     }
 }
