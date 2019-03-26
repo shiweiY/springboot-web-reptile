@@ -16,11 +16,12 @@ public class SelectController {
 	@Autowired
 	SelectMapper sm;
 	
+	/***
+	 * 获取热门城市
+	 * @return
+	 */
 	@RequestMapping(value = "/getHotCity",method = RequestMethod.GET)
 	public List<Object> selectHotCity() {
-		
-		System.out.println();
-		System.out.println();
 		
 		List<Object> hotcity = sm.getHotCity();
 		

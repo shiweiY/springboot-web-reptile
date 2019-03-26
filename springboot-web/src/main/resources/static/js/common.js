@@ -15,13 +15,9 @@
  * @author yangsw
  */
 function jobSearch(){
-//	var selectspan = $("span[selectspan=\"true\"]");
-//	var city_name = selectspan.html();
 
 
-	var param = {
-			cityname : ''
-	};
+	var param = getPageFilterParams();
 
 	$.ajax({
 		type:"get",
@@ -96,10 +92,15 @@ function changeJobData(idkey,defaultNum){
 		}
 
 	}
-
-
 }
 
+/***
+ * 查询时获取选择的条件进行参数处理
+ * @returns josn-params
+ */
+function getPageFilterParams(){
+	var city = $("#hotcity").children("span[selectspan='true']").html();
+}
 
 
 

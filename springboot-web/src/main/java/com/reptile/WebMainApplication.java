@@ -27,14 +27,8 @@ public class WebMainApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		System.out.println(1);
-		System.out.println(2);
 		
 		List<Object> hotcity = rs.getHotCity();
-		
-		System.out.println(3);
-		System.out.println(4);
-		System.out.println(5);
 		
 		RedisHelper.setSerialData("mainPage_hotcity", hotcity);
 	}
