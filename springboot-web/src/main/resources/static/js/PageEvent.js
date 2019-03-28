@@ -85,35 +85,23 @@ $(document).ready(function() {
 		}
 	}
 
-
-
 	/***
 	 * 下拉选组件初始化
 	 */
-	$("#ExpSelect").multiselect({
-		nonSelectedText: "工作经验",
-		buttonWidth:139,
-		width:80
+	$('#ExpSelect').dropdown( {
+		gutter : 5
 	});
-	$("#DegreeSelect").multiselect({
-		nonSelectedText: "学历要求",
-		buttonWidth:139,
-		width:80
+	$('#DegreeSelect').dropdown( {
+		gutter : 5
 	});
-	$("#SalarySelect").multiselect({
-		nonSelectedText: "薪资要求",
-		buttonWidth:139,
-		width:80
+	$('#SalarySelect').dropdown( {
+		gutter : 5
 	});
-	$("#StageSelect").multiselect({
-		nonSelectedText: "融资阶段",
-		buttonWidth:139,
-		width:80
+	$('#StageSelect').dropdown( {
+		gutter : 5
 	});
-	$("#ScaleSelect").multiselect({
-		nonSelectedText: "公司规模",
-		buttonWidth:139,
-		width:80
+	$('#ScaleSelect').dropdown( {
+		gutter : 5
 	});
 
 });

@@ -96,10 +96,15 @@ function changeJobData(idkey,defaultNum){
 
 /***
  * 查询时获取选择的条件进行参数处理
- * @returns josn-params
+ * @returns json-params
  */
 function getPageFilterParams(){
 	var city = $("#hotcity").children("span[selectspan='true']").html();
+	
+	//工作经验
+	var exp = $("#ExpSelect").next().children("button").attr("title");
+	console.log(exp);
+	
 }
 
 

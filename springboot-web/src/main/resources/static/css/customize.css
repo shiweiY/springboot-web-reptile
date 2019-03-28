@@ -18,23 +18,52 @@ a {
 	width: 100%;
 	height: 150px;
 	top: 0;
-	display: block;
+	/* display: block; */
 	box-shadow: 0px 15px 10px -15px #ccc;
 	overflow: visible;
-}
-
-.search-box {
-	margin: 0 auto;
-	padding-top: 20px;
-	width: 900px;
-	/* position: relative; */
-	font-size: 12px;
 }
 
 .city-wrapper {
 	padding-top: 15px;
 	max-height: 80px;
 }
+
+/*分辨率大于1440，采用下面的样式*/
+@media screen and (min-device-width:1440px) {
+	.search-box {
+		margin: 0 auto;
+		padding-top: 20px;
+		width: 900px;
+		/* position: relative; */
+		font-size: 18px;
+	}
+	.left-Affix {
+		padding-top: 50px;
+		margin-left: 145px;
+		width: 150px;
+		overflow: visible;
+	}
+	.setBottom {
+		margin-bottom: 0px;
+	}
+}
+/*分辨率低于1440，采用下面的样式*/
+@media screen and (max-device-width:1440px) {
+	.search-box {
+		margin: 0 auto;
+		padding-top: 20px;
+		width: 900px;
+		/* position: relative; */
+		font-size: 12px;
+	}
+	.left-Affix {
+		padding-top: 50px;
+		margin-left: 60px;
+		width: 150px;
+		overflow: visible;
+	}
+}
+
 
 .cursortag {
 	cursor: pointer;
@@ -49,20 +78,12 @@ a {
 	z-index: 1;
 }
 
-
 .data-body {
 	padding-top: 30px;
 	margin: 0 auto;
 	width: 900px;
 	overflow: visible;
 	float: left;
-}
-
-.left-Affix {
-	padding-top: 50px;
-	margin-left: 60px;
-	width: 150px;
-	overflow: visible;
 }
 
 .job-item {

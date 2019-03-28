@@ -17,16 +17,13 @@
 					<button onclick="jobSearch()" class="btn btn-info btn-search">查找</button>
 				</span>
 			</div>
-			<dl class="dl-city">
+			<dl class="dl-city setBottom">
 				<dd id="hotcity" class="city-wrapper"></dd>
 			</dl>
 			<div id="filter">
-				<div class="col-xs-2 noleft15">
-					<select id="ExpSelect" size="2">
-						<!--<optgroup label="未上线">
-					<option value="0">未排产</option>
-				</optgroup> -->
-						<option value="exp-all">不限经验</option>
+				<div >
+					<select id="ExpSelect" class="cd-select">
+						<option value="exp-all" selected>不限经验</option>
 						<option value="exp-0">应届生</option>
 						<option value="exp-1">1年以内</option>
 						<option value="exp-1-3">1-3年</option>
@@ -35,9 +32,10 @@
 						<option value="exp-10">10年以上</option>
 					</select>
 				</div>
-				<div class="col-xs-2 noleft15">
-					<select id="DegreeSelect" size="2">
-						<option value="degree-all">不限学历</option>
+				
+				<div >
+					<select id="DegreeSelect" class="cd-select">
+						<option value="degree-all" selected>不限学历</option>
 						<option value="degree-0">初中及以下</option>
 						<option value="degree-1">中专/中技</option>
 						<option value="degree-2">高中</option>
@@ -47,9 +45,9 @@
 						<option value="degree-6">博士</option>
 					</select>
 				</div>
-				<div class="col-xs-2 noleft15">
-					<select id="SalarySelect" size="2">
-						<option value="salary-all">不限薪资</option>
+				 <div >
+					<select id="SalarySelect" class="cd-select">
+						<option value="salary-all" selected>不限薪资</option>
 						<option value="salary-0">3k以下</option>
 						<option value="salary-1">3-5k</option>
 						<option value="salary-2">5-10k</option>
@@ -60,9 +58,9 @@
 						<option value="salary-7">50k以上</option>
 					</select>
 				</div>
-				<div class="col-xs-2 noleft15">
-					<select id="StageSelect" size="2">
-						<option value="stage-all">不限融资</option>
+				<div >
+					<select id="StageSelect" class="cd-select">
+						<option value="stage-all" selected>不限融资</option>
 						<option value="stage-0">未融资</option>
 						<option value="stage-1">天使轮</option>
 						<option value="stage-2">A轮</option>
@@ -73,9 +71,9 @@
 						<option value="stage-7">不需要融资</option>
 					</select>
 				</div>
-				<div class="col-xs-2 noleft15">
-					<select id="ScaleSelect" size="2">
-						<option value="scale-all">不限人数</option>
+				<div>
+					<select id="ScaleSelect" class="cd-select">
+						<option value="scale-all" selected>不限人数</option>
 						<option value="scale-0">0-20人</option>
 						<option value="scale-1">20-99人</option>
 						<option value="scale-2">100-499人</option>
