@@ -8,6 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/***
+ * 向boss service 服务器请求交互
+ * 
+ * @author shiwei
+ *
+ */
+
 @FeignClient(name="boss-service")
 public interface ReptileBossJobService {
 	

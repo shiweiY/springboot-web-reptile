@@ -1,10 +1,9 @@
-package com.reptile.cache.service;
+package com.reptile.web.tech.cache.service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.JedisPool;

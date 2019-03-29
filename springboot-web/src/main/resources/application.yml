@@ -4,7 +4,11 @@ server:
 spring:
   application: 
     name: project-web
-
+  datasource: 
+    url: jdbc:mysql://localhost:3306/reptiledatabase?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
 
 eureka: 
   client: 

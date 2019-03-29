@@ -17,11 +17,12 @@
 function jobSearch(){
 
 
-	var param = getPageFilterParams();
+	var params = getPageFilterParams();
 
 	$.ajax({
 		type:"get",
 		url:"/main/searchJob",
+		data:params,
 		dataType:"json",
 		async:true,
 		success:function(data,flag){
@@ -99,11 +100,33 @@ function changeJobData(idkey,defaultNum){
  * @returns json-params
  */
 function getPageFilterParams(){
+	
+	var params={};
+	
 	var city = $("#hotcity").children("span[selectspan='true']").html();
 	
+	if(city == undefined || city == ""){
+		city = "全国";
+	}
+	
 	//工作经验
-	var exp = $("#ExpSelect").next().children("button").attr("title");
-	console.log(exp);
+	var exp = $("input[name='ExpSelect']").val();
+	var degree = $("input[name='DegreeSelect']").val();
+	var salary = $("input[name='SalarySelect']").val();
+	var stage = $("input[name='StageSelect']").val();
+	var scale = $("input[name='ScaleSelect']").val();
+	var scale = $("input[name='ScaleSelect']").val();
+	var query = $("#SearchInput").val();
+	
+	params.query=query;
+	params.city=city;
+	params.exp=exp;
+	params.degree=degree;
+	params.salary=salary;
+	params.stage=stage;
+	params.scale=scale;
+	
+	return params;
 	
 }
 
@@ -147,8 +170,8 @@ function initPageData(){
 function pageAffixAppend(){
 
 	var li_boss = "<li><a id=\"boss_job_data\" class=\"cursortag\" name=\"left_affix\" >Boss直聘</a></li>";
-	var li_zhilian = "<li><a id=\"zhilian_job_data\" class=\"cursortag\" name=\"left_affix\" >智联招聘</a></li>";
-	var li_51 = "<li><a id=\"51_job_data\" class=\"cursortag\" name=\"left_affix\" >51job</a></li>";
+	var li_zhilian = "<li><a id=\"zhilian_job_data\" class=\"cursortag\" name=\"left_affix\" >智联招聘(暂未开放)</a></li>";
+	var li_51 = "<li><a id=\"51_job_data\" class=\"cursortag\" name=\"left_affix\" >51job(暂未开放)</a></li>";
 
 	$("#affixul").append(li_boss+li_zhilian+li_51);
 
@@ -204,6 +227,7 @@ function getSerialData(key){
 			traditional:true,//通过ajax提交数组时，jquery深度序列化以适应php等,它会自动在所设定的参数后面增加中括号： [] 后台取值不便,traditional为true可防止深度序列化
 			async : false,
 			success:function(data,flag){
+				console.log('ok');
 				result = data.mapData.result;
 			}
 		});
