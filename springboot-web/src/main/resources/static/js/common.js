@@ -25,9 +25,15 @@ function jobSearch(){
 		data:params,
 		dataType:"json",
 		async:true,
-		success:function(data,flag){
+		success:function(data){
+			//如果出现异常，显示错误讯息，清空已查询出的数据和分页标签
+			if(data.flag == false){
+				$("#joblist,#pagination").empty();//清空已经查询出的数据和下方的分页ul
+				$("#joblist").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
+				return;
+			}
+
 			if(data.mapData.list != null && data.mapData.list.length > 0 ){
-				console.log(data.message);
 				changeJobData('boss_job_data',1);//显示数据，默认显示Boss直聘页面
 			}else{
 				alert("查询异常，请稍后再试！");

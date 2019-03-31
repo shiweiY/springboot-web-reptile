@@ -21,7 +21,7 @@ public interface ReptileBossJobService {
 	@RequestMapping(value = "/boss/getStr",method = RequestMethod.GET)
 	public String getStringData();
 	
-	@RequestMapping(value = "/boss/getPageJob",method = RequestMethod.POST)
+	@RequestMapping(value = "/boss/getBossPageJob",method = RequestMethod.POST)
 	public <T> List<T> getBossPageJob(@RequestParam("condition") String condition);
 	
 }

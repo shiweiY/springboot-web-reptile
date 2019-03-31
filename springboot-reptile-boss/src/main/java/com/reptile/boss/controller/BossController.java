@@ -41,7 +41,7 @@ public class BossController {
 		return "hello spring";
 	}
 	
-	@PostMapping("/getPageJob")
+	@PostMapping("/getBossPageJob")
 	public List<Job> getJobPage(@RequestParam("condition") String url) {
 		
 		String result = "";

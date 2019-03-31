@@ -50,21 +50,28 @@ class MainController{
 			Jmodel.setMapData(resultMap);
 			RedisHelper.setSerialData("boss_job_data", list);
 			Jmodel.setFlag(true);
+			
+			long end = System.currentTimeMillis();
+			long num = end - start;
+			double sum = num / 1000d;
+			
+			Jmodel.setMessage("后端爬取及处理时间："+sum);
 		}else {
 			Jmodel.setFlag(false);
-			Jmodel.setMessage("Boss 直聘,职位数据爬去失败");
+			Jmodel.setMessage("未查询到数据，请切换条件重试或者联系管理员");
 		}
-		long end = System.currentTimeMillis();
 
-		long num = end - start;
-		double sum = num / 1000d;
-
-		Jmodel.setMessage("后端爬取及处理时间："+sum);
+		
 		//		List<Object> list2 = (List<Object>) RedisHelper.getSerialData("boss_job_data");
 
 		return Jmodel;
 	}
 
+	/***
+	 * 获取页面参数，最终返回拼接的url
+	 * @param request
+	 * @return String
+	 */
 	public String bossParamsHandle(HttpServletRequest request){
 
 		String query = request.getParameter("query");//职位名称
@@ -131,12 +138,14 @@ class MainController{
 			surl = citypath+surl;
 		}
 
+		//如果结尾有  - 符号 则 去除
 		if(surl.charAt(surl.length()-1) == '-' ){
 			surl = surl.substring(0, surl.length()-1);
 		}
 		
+		//要搜索的职位名称
 		if(query != null && !query.isEmpty()){
-			surl = surl+"/?query="+query;
+			surl = surl+"?query="+query;
 		}
 
 		System.out.println(surl);

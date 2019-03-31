@@ -37,7 +37,7 @@ public class BossPageServiceImpl implements BossPageService {
 	 */
 	@Override
 	public List<Job> getJobList(String pageDoc) {
-
+//		System.out.println(pageDoc);
 		Document doc = Jsoup.parse(pageDoc);
 
 		Elements job_lists = doc.select("div[class='job-list']");
@@ -46,6 +46,9 @@ public class BossPageServiceImpl implements BossPageService {
 
 		Elements job_primary = job_list.select("div[class='job-primary']");//职位信息div集合
 
+		if(job_primary == null || job_primary.isEmpty()){
+			return null;
+		}
 		String regex = "<em class=\"vline\"></em>";//以此规则进行分割信息
 		List<Job> jobList = new ArrayList<Job>();
 		for (int i = 0;i < job_primary.size();i++) {
@@ -94,11 +97,23 @@ public class BossPageServiceImpl implements BossPageService {
 
 			String[] p_arr2 = company_p.toString().split(regex);//分割p中的信息
 
-			String company_type = p_arr2[0].substring(3, p_arr2[0].length());//公司性质
+			
+			String company_type = "";//公司性质
+			String company_stage = "";//融资阶段
+			String company_scale = "";//公司规模
+			//标签中存在公司信息， 某些公司是可以选择不填写的
+			if(p_arr2 != null && p_arr2.length > 0 ){
+				company_type = p_arr2[0].substring(3, p_arr2[0].length());//公司性质
 
-			String company_stage = p_arr2[1];//融资阶段
+				//boss直聘目前公司信息最多有三条	 em：   <p>计算机软件<em class="vline"></em>不需要融资<em class="vline"></em>20-99人</p>
+				if(p_arr2.length == 3){
+					company_stage = p_arr2[1];//融资阶段
+					company_scale = p_arr2[2].substring(0, p_arr2[2].length()-4);//公司规模
+				}else if(p_arr2.length == 2){
+					company_stage = p_arr2[1].substring(0, p_arr2[1].length()-4);
+				}
 
-			String company_scale = p_arr2[2].substring(0, p_arr2[2].length()-4);//公司规模
+			}
 
 
 			Company cpany = new Company(String.valueOf(i),company_name,company_link,company_type,company_stage,company_scale);
