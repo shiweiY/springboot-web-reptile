@@ -40,6 +40,8 @@ function jobSearch(pageNum){
 			if(data.mapData.list != null && data.mapData.list.length > 0 ){
 				changeJobData('boss_job_data',1,pageNum);//显示第一页数据，默认显示Boss直聘页面
 				$("a[name='pagination_a']").first().parent().addClass("active");//选中第一页
+				$("#pagination").attr("pagenum",pageNum);//标识当前大页
+				$("#pagination").attr("datanum",1);//标识当前数据页码
 			}else{
 				alert("查询异常，请稍后再试！");
 			}
@@ -191,9 +193,9 @@ function pageAffixAppend(){
 
 /***
  * 页面下方分页页码  动态添加
- * @param paginationNum 数据页数
+ * @param paginationNum 数据总共页数
  * @param pageNum 当前第几大页
- * @param dataNum 第几页数据
+ * @param dataNum List中第几页的数据
  */
 function paginationAppend(paginationNum,pageNum){
 	var li_a_start = "";
@@ -207,7 +209,7 @@ function paginationAppend(paginationNum,pageNum){
 		var numStart = 2*pageNum+(pageNum-2);
 		var i = 1;
 		while(i <= paginationNum){
-			li_a_start += "<li><a id=\"pagination_a_"+numStart+"\" name=\"pagination_a\" dataNum=\""+i+"\" pageNum=\""+pageNum+"\" class=\"cursortag\">"+numStart+"</a></li>";
+			li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\" dataNum=\""+i+"\" pageNum=\""+pageNum+"\" class=\"cursortag\">"+numStart+"</a></li>";
 			numStart += 1;
 			i++;
 		}
