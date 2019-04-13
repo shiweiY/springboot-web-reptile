@@ -6,18 +6,20 @@
  */
 
 
-
-
 /***
  * 页面事件部分 ---------------------------------------------------------------------------------------
  * 
  * 职位搜索按钮
  * @author yangsw
  */
-function jobSearch(){
-
+function jobSearch(pageNum){
 
 	var params = getPageFilterParams();
+
+	//大于1  说明是下方分页按钮的查询，页面将显示非第一页 数据
+	if(Number(pageNum) > 1){
+		params.page = pageNum;
+	}
 
 	$.ajax({
 		type:"get",
@@ -28,13 +30,16 @@ function jobSearch(){
 		success:function(data){
 			//如果出现异常，显示错误讯息，清空已查询出的数据和分页标签
 			if(data.flag == false){
-				$("#joblist,#pagination").empty();//清空已经查询出的数据和下方的分页ul
+				//清空已经查询出的数据和下方的分页ul
+				$("#joblist,#pagination").empty();
+				//显示错误讯息
 				$("#joblist").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
 				return;
 			}
 
 			if(data.mapData.list != null && data.mapData.list.length > 0 ){
-				changeJobData('boss_job_data',1);//显示数据，默认显示Boss直聘页面
+				changeJobData('boss_job_data',1,pageNum);//显示第一页数据，默认显示Boss直聘页面
+				$("a[name='pagination_a']").first().parent().addClass("active");//选中第一页
 			}else{
 				alert("查询异常，请稍后再试！");
 			}
@@ -44,17 +49,18 @@ function jobSearch(){
 }
 
 /***
- * 附加导航栏位点击时右方的数据切换
+ * 职位数据拼接展示
  * 
  * @author yangsw
  * @param idkey 附加导航栏的id,也是redis中数据的key
  * @param defaultNum 默认显示第几页数据
+ * @param pageNum  第几大页
  */
-function changeJobData(idkey,defaultNum){
+function changeJobData(idkey,defaultNum,pageNum){
 
 	var joblist = getSerialData(idkey);//获取数据
 	var length = joblist.length;
-	var pageNum = Math.ceil(length/10);//页数,获取此值也为了下方分页按钮的动态生成
+	var paginationNum = Math.ceil(length/10);//页数,获取此值也为了下方分页按钮的动态生成
 
 	if(joblist != null){
 
@@ -64,14 +70,14 @@ function changeJobData(idkey,defaultNum){
 		var company_start_tag = "";
 		var company_tag = "";
 		var company_info_tag = "";
-		
+
 		//数据分页
-		var pageBegin = (defaultNum-1)*10;
-		var pageEnd = defaultNum * 10;
+		var dataBegin = (defaultNum-1)*10;
+		var dataEnd = defaultNum * 10;
 
 		$("#joblist").empty();//数据变更前先清空数据div
 		$.each(joblist,function(i,job){
-			if(i >= pageBegin && i < pageEnd){
+			if(i >= dataBegin && i <= dataEnd){
 				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
 				info_title_tag = "<div class=\"info-title\"><a class=\"cursortag\" link=\""+job.job_link+"\">"+job.title+"</a>"+
 				"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
@@ -86,16 +92,16 @@ function changeJobData(idkey,defaultNum){
 
 				$("#joblist").append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
 
-				//附加菜单选中
+				//左侧附加菜单选中
 				$("#"+idkey).parent().addClass("active");
 
 			}
 		});
 
 		//页面是否已经生成过分页按钮, 只是为了切换分页数据，则下方分页按钮不再生成
-		if($("#pagination:has(li)").length==0){
-			//动态拼接分页栏位显示
-			paginationAppend(pageNum);
+		if($("#pagination:has(li)").length==0 || pageNum >= 1){
+			//动态拼接分页栏位显示		数据页数和当前大页
+			paginationAppend(paginationNum,pageNum);
 		}
 
 	}
@@ -106,15 +112,15 @@ function changeJobData(idkey,defaultNum){
  * @returns json-params
  */
 function getPageFilterParams(){
-	
+
 	var params={};
-	
+
 	var city = $("#hotcity").children("span[selectspan='true']").html();
-	
+
 	if(city == undefined || city == ""){
 		city = "全国";
 	}
-	
+
 	//工作经验
 	var exp = $("input[name='ExpSelect']").val();
 	var degree = $("input[name='DegreeSelect']").val();
@@ -123,7 +129,7 @@ function getPageFilterParams(){
 	var scale = $("input[name='ScaleSelect']").val();
 	var scale = $("input[name='ScaleSelect']").val();
 	var query = $("#SearchInput").val();
-	
+
 	params.query=query;
 	params.city=city;
 	params.exp=exp;
@@ -131,9 +137,9 @@ function getPageFilterParams(){
 	params.salary=salary;
 	params.stage=stage;
 	params.scale=scale;
-	
+
 	return params;
-	
+
 }
 
 
@@ -184,28 +190,38 @@ function pageAffixAppend(){
 }
 
 /***
- * 页码分页动态添加
+ * 页面下方分页页码  动态添加
+ * @param paginationNum 数据页数
+ * @param pageNum 当前第几大页
+ * @param dataNum 第几页数据
  */
-function paginationAppend(pageNum){
+function paginationAppend(paginationNum,pageNum){
 	var li_a_start = "";
 
-	if(pageNum > 1){
+	if(paginationNum > 1){
 		$("#pagination").empty();
-		for (var i = 0; i <= pageNum+1; i++) {
-			if(i == 0){
-				li_a_start += "<li ><a id=\"pagination_a\" class=\"cursortag\">&laquo;</a></li>";
-			}else if(i == pageNum+1){
-				li_a_start += "<li><a id=\"pagination_a\" class=\"cursortag\">&raquo;</a></li>";
-			}else{
-				li_a_start += "<li><a id=\"pagination_a_"+i+"\" class=\"cursortag\">"+i+"</a></li>";
-			}
-		}
-	}
-	
-	$("#pagination").append(li_a_start);
-	$("#pagination_a_1").parent().addClass("active");
 
+		//		左边<<
+		li_a_start += "<li><a id=\"pagination_left\" class=\"cursortag\">&laquo;</a></li>";
+
+		var numStart = 2*pageNum+(pageNum-2);
+		var i = 1;
+		while(i <= paginationNum){
+			li_a_start += "<li><a id=\"pagination_a_"+numStart+"\" name=\"pagination_a\" dataNum=\""+i+"\" pageNum=\""+pageNum+"\" class=\"cursortag\">"+numStart+"</a></li>";
+			numStart += 1;
+			i++;
+		}
+
+		//更多页数据按钮
+		li_a_start += "<li><a id=\"pagination_m\" class=\"cursortag\">...</a></li>";
+		//		右边>>
+		li_a_start += "<li><a id=\"pagination_right\" class=\"cursortag\">&raquo;</a></li>";
+
+	}
+
+	$("#pagination").append(li_a_start);
 }
+
 
 
 
