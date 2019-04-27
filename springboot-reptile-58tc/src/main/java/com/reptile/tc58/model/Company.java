@@ -1,4 +1,4 @@
-package com.reptile.boss.model;
+package com.reptile.tc58.model;
 
 import java.util.List;
 

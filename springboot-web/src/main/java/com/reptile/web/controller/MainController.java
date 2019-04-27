@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.reptile.web.mapper.Main2RepositoryMapper;
 import com.reptile.web.model.JSONReturn;
-import com.reptile.web.service.ReptileBossJobService;
+import com.reptile.web.service.FeignBossService;
+import com.reptile.web.service.FeignLagouService;
+import com.reptile.web.service.FeignTc58Service;
 import com.reptile.web.tech.cache.service.RedisHelper;
 
 @RestController
@@ -25,8 +27,14 @@ class MainController{
 	private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
 	@Autowired
-	ReptileBossJobService boss_service;
+	FeignBossService boss_service;
+	
+	@Autowired
+	FeignLagouService lagou_service;
 
+	@Autowired
+	FeignTc58Service tc58_service;
+	
 	@Autowired
 	Main2RepositoryMapper brmapper;
 
@@ -50,7 +58,10 @@ class MainController{
 
 		try{
 			//boss直聘查询
-			bosslist = boss_service.getBossPageJob(bossurl);
+//			bosslist = boss_service.getBossPageJob(bossurl);
+//			bosslist = lagou_service.getLagouPageJob("");
+			bosslist = tc58_service.get58TcPageJob("");
+			
 
 
 			if(bosslist != null && !bosslist.isEmpty()) {

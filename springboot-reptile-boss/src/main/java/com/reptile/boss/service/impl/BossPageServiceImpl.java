@@ -35,6 +35,7 @@ public class BossPageServiceImpl implements BossPageService {
 	 * 
 	 * @param pageDoc 被转化为String的Document对象
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Job> getJobList(String pageDoc) {
 //		System.out.println(pageDoc);
@@ -97,7 +98,6 @@ public class BossPageServiceImpl implements BossPageService {
 
 			String[] p_arr2 = company_p.toString().split(regex);//分割p中的信息
 
-			
 			String company_type = "";//公司性质
 			String company_stage = "";//融资阶段
 			String company_scale = "";//公司规模
@@ -114,10 +114,16 @@ public class BossPageServiceImpl implements BossPageService {
 				}
 
 			}
+			
+//			公司其他信息
+			List<String> otherInfo = new ArrayList<>();
+			otherInfo.add(company_type);
+			otherInfo.add(company_stage);
+			otherInfo.add(company_scale);
 
-
-			Company cpany = new Company(String.valueOf(i),company_name,company_link,company_type,company_stage,company_scale);
-
+			Company cpany = new Company(String.valueOf(i),company_name,company_link,otherInfo);
+			
+			
 			Job job = new Job(job_title,job_salary,job_address,job_exp,job_degree,job_time,job_link,cpany);
 
 

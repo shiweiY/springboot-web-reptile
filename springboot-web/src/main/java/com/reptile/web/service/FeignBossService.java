@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 
 @FeignClient(name="boss-service")
-public interface ReptileBossJobService {
+public interface FeignBossService {
 	
 	@RequestMapping(value = "/boss/getStr",method = RequestMethod.GET)
 	public String getStringData();

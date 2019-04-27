@@ -1,14 +1,14 @@
-package com.reptile.boss.model;
+package com.reptile.lagou.model;
 
 public class Job {
-	private String title;//职位名称
-	private String salary;//职位薪资
-	private String address;//职位地址
-	private String exp;//工作经验
-	private String degree;//学历
-	private String job_time;//发布时间
-	private String job_link;//原网页链接
-	private Company company;//公司信息
+	private String title;
+	private String salary;
+	private String address;
+	private String exp;
+	private String degree;
+	private String job_time;
+	private String job_link;
+	private Company company;
 	
 	
 	public Company getCompany() {

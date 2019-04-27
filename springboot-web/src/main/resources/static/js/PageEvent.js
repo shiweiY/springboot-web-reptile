@@ -117,7 +117,7 @@ $(document).ready(function() {
 	});
 	//分页栏位 右箭头 按钮
 	$("#pagination").on("click","#pagination_right",function(){
-		var pageNum = $("#pagination").attr("pagenum");
+		var pageNum = $("#pagination").attr("pagenum");//当前Redis中的数据页
 		
 		var activeTag = $("#pagination").children(".active");//当前选中的元素
 		var nextTag = $(activeTag).next().children().first();

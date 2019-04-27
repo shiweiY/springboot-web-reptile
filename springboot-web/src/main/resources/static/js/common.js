@@ -89,9 +89,12 @@ function changeJobData(idkey,defaultNum,pageNum){
 				company_start_tag = "<div class=\"job-company\">";
 				company_tag = "<div class=\"info-title-right\"><a class=\"cursortag\" link=\""+job.company.link+"\">"+job.company.name+"</a>" +
 				"<span class=\"typeword\">"+job.job_time+"</span></div>";
-				company_info_tag = "<div class=\"company-info\"><span >"+job.company.type+"<em class=\"vline\"></em>"+job.company.stage+"<em class=\"vline\">" +
-				"</em>"+job.company.scale+"</span></div></div></div>";
-
+				
+//				var otherInfo = job.company.otherInfo;
+				
+				company_info_tag = "<div class=\"company-info\"><span >"+job.company.otherInfo[0]+"<em class=\"vline\"></em>"+job.company.otherInfo[1]+"<em class=\"vline\">" +
+				"</em>"+job.company.otherInfo[2]+"</span></div></div></div>";
+				
 				$("#joblist").append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
 
 				//左侧附加菜单选中
