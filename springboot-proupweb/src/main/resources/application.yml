@@ -1,11 +1,11 @@
 server:
-  port: 8081
+  port: 8099
 
 spring:
   application: 
-    name: project-web
+    name: proup-web
   datasource: 
-    url: jdbc:mysql://localhost:3306/reptiledatabase?useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/reptiledatabase?allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
@@ -19,15 +19,13 @@ eureka:
 #       defaultZone: http://192.168.0.113:8089/eureka/
     
 ribbon:
-  ReadTimeout: 60000
-  ConnectTimeout: 60000
   eureka:
-    enable: true
+    enabled: true
 
 feign:
   client:
     default:
       #这里时间一定要调长，否则feign客户端会报ReadTimeOut  服务端报Error parsing HTTP request header
-      connectTimeout: 60000
-      readTimeout: 60000
+      connectTimeout: 30000
+      readTimeout: 30000
       loggerLevel: basic

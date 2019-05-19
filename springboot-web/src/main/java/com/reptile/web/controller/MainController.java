@@ -1,8 +1,11 @@
 package com.reptile.web.controller;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,13 +31,13 @@ class MainController{
 
 	@Autowired
 	FeignBossService boss_service;
-	
+
 	@Autowired
 	FeignLagouService lagou_service;
 
 	@Autowired
 	FeignTc58Service tc58_service;
-	
+
 	@Autowired
 	Main2RepositoryMapper brmapper;
 
@@ -58,10 +61,10 @@ class MainController{
 
 		try{
 			//boss直聘查询
-//			bosslist = boss_service.getBossPageJob(bossurl);
-//			bosslist = lagou_service.getLagouPageJob("");
-			bosslist = tc58_service.get58TcPageJob("");
-			
+			bosslist = boss_service.getBossPageJob(bossurl);
+			//			bosslist = lagou_service.getLagouPageJob("");
+			//			bosslist = tc58_service.get58TcPageJob("");
+
 
 
 			if(bosslist != null && !bosslist.isEmpty()) {
@@ -101,93 +104,127 @@ class MainController{
 	 */
 	public String bossParamsHandle(HttpServletRequest request){
 
-		String query = request.getParameter("query");//职位名称
-		String cityname = request.getParameter("city");//城市名字
-		String exp = request.getParameter("exp");//工作经验
-		String degree = request.getParameter("degree");//学历
-		String salary = request.getParameter("salary");//薪资
-		String stage = request.getParameter("stage");//融资阶段
-		String scale = request.getParameter("scale");//公司规模
-		String page = request.getParameter("page");//公司规模
+		try {
+			String query = request.getParameter("query");//职位名称
+			String cityname = request.getParameter("city");//城市名字
+			String exp = request.getParameter("exp");//工作经验
+			String degree = request.getParameter("degree");//学历
+			String salary = request.getParameter("salary");//薪资
+			String stage = request.getParameter("stage");//融资阶段
+			String scale = request.getParameter("scale");//公司规模
+			String page = request.getParameter("page");//公司规模
 
-		String surl = "";
+			String surl = "";
 
-		Map<String,String >  params = new HashMap<>();
+			Map<String,String >  params = new HashMap<>();
 
-		//y_4-d_203-e_104-s_301-t_804/
-		if(salary != null && (salary.indexOf("all") == -1)){
-			params.put("tablename", "salarymapped");
-			params.put("where", "page_param=\'"+salary+"\'");
-			params.put("value", "salary_path");
-			String salary_path = brmapper.selectTableOneValue(params);
-			surl += salary_path+"-";
-		}
+			//y_4-d_203-e_104-s_301-t_804/
+			if(salary != null && (salary.indexOf("all") == -1)){
+				params.put("tablename", "salarymapped");//表名
+				params.put("where", "page_param=\'"+salary+"\'");//条件
+				params.put("value", "boss_salary_param");//想要查询的结果
+				String salary_path = brmapper.selectTableOneValue(params);
+				surl += salary_path+"-";
+			}
 
-		if(degree != null && (degree.indexOf("all") == -1)){
-			params.put("tablename", "degreemapped");//表格
-			params.put("where", "page_param=\'"+degree+"\'");//where条件
-			params.put("value", "degree_path");//需要查询出来的值
-			String degree_path = brmapper.selectTableOneValue(params);
-			surl += degree_path+"-";
-		}
+			if(degree != null && (degree.indexOf("all") == -1)){
+				params.put("tablename", "degreemapped");//表名
+				params.put("where", "page_param=\'"+degree+"\'");//where条件
+				params.put("value", "boss_degree_param");//需要查询出来的值
+				String degree_path = brmapper.selectTableOneValue(params);
+				surl += degree_path+"-";
+			}
 
-		//y_4-d_203-e_104-s_301-t_804/
-		if(exp != null && (exp.indexOf("all") == -1)){
-			params.put("tablename", "expmapped");//表格
-			params.put("where", "page_param=\'"+exp+"\'");//where条件
-			params.put("value", "exp_path");//需要查询出来的值
-			String exp_path = brmapper.selectTableOneValue(params);
-			surl += exp_path+"-";
-		}
+			//y_4-d_203-e_104-s_301-t_804/
+			if(exp != null && (exp.indexOf("all") == -1)){
+				params.put("tablename", "expmapped");//表
+				params.put("where", "page_param=\'"+exp+"\'");//where条件
+				params.put("value", "boss_exp_param");//需要查询出来的值
+				String exp_path = brmapper.selectTableOneValue(params);
+				surl += exp_path+"-";
+			}
 
-		if(scale != null && (scale.indexOf("all") == -1)){
-			params.put("tablename", "scalemapped");
-			params.put("where", "page_param=\'"+scale+"\'");
-			params.put("value", "scale_path");
-			String scale_path = brmapper.selectTableOneValue(params);
-			surl += scale_path+"-";
-		}
+			if(scale != null && (scale.indexOf("all") == -1)){
+				params.put("tablename", "scalemapped");
+				params.put("where", "page_param=\'"+scale+"\'");
+				params.put("value", "boss_scale_param");
+				String scale_path = brmapper.selectTableOneValue(params);
+				surl += scale_path+"-";
+			}
 
-		//y_4-d_203-e_104-s_301-t_804/
-		if(stage != null && (stage.indexOf("all") == -1)){
-			params.put("tablename", "stagemapped");
-			params.put("where", "page_param=\'"+stage+"\'");
-			params.put("value", "stage_path");
-			String stage_path = brmapper.selectTableOneValue(params);
-			surl += stage_path;
-		}
+			//y_4-d_203-e_104-s_301-t_804/
+			if(stage != null && (stage.indexOf("all") == -1)){
+				params.put("tablename", "stagemapped");
+				params.put("where", "page_param=\'"+stage+"\'");
+				params.put("value", "boss_stage_param");
+				String stage_path = brmapper.selectTableOneValue(params);
+				surl += stage_path;
+			}
 
 
-		if(cityname != null && !cityname.isEmpty()){
-			params.put("tablename", "citymapped");//表格
-			params.put("where", "city_name=\'"+cityname+"\'");//where条件
-			params.put("value", "city_path");//需要查询出来的值
-			String citypath = brmapper.selectTableOneValue(params);
-			surl = citypath+surl;
-		}
+			if(cityname != null && !cityname.isEmpty()){
+				params.put("tablename", "citymapped");//表格
+				params.put("where", "city_name=\'"+cityname+"\'");//where条件
+				params.put("value", "boss_city_param");//需要查询出来的值
+				String citypath = brmapper.selectTableOneValue(params);
+				surl = citypath+surl;
+			}
 
-		//如果结尾有  - 符号 则 去除
-		if(surl.charAt(surl.length()-1) == '-' ){
-			surl = surl.substring(0, surl.length()-1);
-		}
+			//如果结尾有  - 符号 则 去除
+			if(surl.charAt(surl.length()-1) == '-' ){
+				surl = surl.substring(0, surl.length()-1);
+			}
 
-		//要搜索的职位名称
-		if(query != null && !query.isEmpty()){
-			surl = surl+"?query="+query;
+			//要搜索的职位名称
+			if(query != null && !query.isEmpty()){
+				surl = surl+"?query="+filterChineseParams(query);
+			}
+
+			//第几页
+			if(page != null && !page.isEmpty()){
+				if(query != null && !query.isEmpty()){
+					surl = surl+"&page="+page;
+				}else{
+					surl = surl+"?page="+page;
+				}
+			}
+			System.out.println(surl);
+			
+			return surl;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			log.error("bossParamsHandle：  参数处理异常！");
 		}
 		
-		//第几页
-		if(page != null && !page.isEmpty()){
-			if(query != null && !query.isEmpty()){
-				surl = surl+"&page="+page;
-			}else{
-				surl = surl+"?page="+page;
-			}
-		}
+		return "";
+	}
 
-		System.out.println(surl);
+	/***
+	 * 中文转码
+	 * @param value
+	 * @return
+	 * @throws Throwable
+	 */
+	public static String enChinese(String value) throws Throwable{
 
-		return surl;
+		return (value != null && !value.isEmpty()) ? URLEncoder.encode(value, "utf-8"):"";
+	}
+
+	/****
+	 * 将参数中的中文字符转码
+	 * @param value  参数
+	 * @return String 中文转码后的参数
+	 * @throws Throwable 
+	 */
+	public static String filterChineseParams(String param) throws Throwable{
+		String reg = "[^\u4E00-\u9FA5]";//中文正则表达
+		Pattern pat = Pattern.compile(reg);
+		Matcher matcher = pat.matcher(param);
+
+		String chineseText = matcher.replaceAll("");//过滤出的中文
+		String encode = enChinese(chineseText);//将此中文转码
+
+		return param.replace(chineseText, encode);
 	}
 
 }

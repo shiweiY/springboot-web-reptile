@@ -56,7 +56,7 @@ function jobSearch(pageNum){
  * @author yangsw
  * @param idkey 附加导航栏的id,也是redis中数据的key
  * @param defaultNum 默认显示第几页数据
- * @param pageNum  第几大页
+ * @param pageNum  原頁面的第几大页
  */
 function changeJobData(idkey,defaultNum,pageNum){
 
@@ -113,7 +113,7 @@ function changeJobData(idkey,defaultNum,pageNum){
 }
 
 /***
- * 查询时获取选择的条件进行参数处理
+ * 查询前获取选择的条件进行参数处理
  * @returns json-params
  */
 function getPageFilterParams(){

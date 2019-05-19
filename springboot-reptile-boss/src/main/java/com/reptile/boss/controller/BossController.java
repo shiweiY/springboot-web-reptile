@@ -52,7 +52,6 @@ public class BossController {
 		List<Job> jobList = null;
 		
 		try {
-			
 			/*以当前时间戳的最后两位为随机策略*/
 			String currentTimeMillis = String.valueOf(System.currentTimeMillis());
 			

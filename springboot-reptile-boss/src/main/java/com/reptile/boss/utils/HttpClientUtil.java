@@ -30,6 +30,7 @@ public class HttpClientUtil {
 		URIBuilder ubuilder = new URIBuilder(ADDRESS+uriget);
 		
 		URI uri = ubuilder.build();
+		System.out.println("请求地址:"+uri.toString());
 		
 		//整理请求头
 		List<Header> lheader = getListHeader(uriget,user_agent);
