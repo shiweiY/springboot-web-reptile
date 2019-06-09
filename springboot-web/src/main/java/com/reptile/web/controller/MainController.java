@@ -1,6 +1,7 @@
 package com.reptile.web.controller;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import com.reptile.web.service.FeignTc58Service;
 import com.reptile.web.tech.cache.service.RedisHelper;
 
 @RestController
-@RequestMapping("/main")
+@RequestMapping("/web/main")
 class MainController{
 
 	private static final Logger log = LoggerFactory.getLogger(MainController.class);
@@ -55,40 +56,40 @@ class MainController{
 
 		JSONReturn Jmodel =new JSONReturn();
 
-		long start = System.currentTimeMillis();
+		//		long start = System.currentTimeMillis();
 
-		List<Object> bosslist = null;
+		List<Object> bosslist = new ArrayList<Object>();
+		List<Object> tc58list = new ArrayList<Object>();
 
 		try{
 			//boss直聘查询
 			bosslist = boss_service.getBossPageJob(bossurl);
-			//			bosslist = lagou_service.getLagouPageJob("");
-			//			bosslist = tc58_service.get58TcPageJob("");
-
-
-
-			if(bosslist != null && !bosslist.isEmpty()) {
-
-				Map<String,Object> resultMap = new HashMap<>();
-				resultMap.put("list", bosslist);
-				Jmodel.setMapData(resultMap);
-				RedisHelper.setSerialData("boss_job_data", bosslist);
-				Jmodel.setFlag(true);
-
-				long end = System.currentTimeMillis();
-				double sum = (end - start) / 1000d;
-
-				Jmodel.setMessage("后端爬取及处理时间："+sum);
-			}else {
-				Jmodel.setFlag(false);
-				Jmodel.setMessage("未查询到数据，请切换条件重试或者联系管理员");
+//			tc58list = tc58_service.get58TcPageJob("");
+			
+			if(bosslist == null){
+				bosslist = new ArrayList<Object>();
 			}
+			
+			if(tc58list == null){
+				tc58list = new ArrayList<Object>();
+			}
+			
 
+			Map<String,Object> resultMap = new HashMap<>();
+			
+			resultMap.put("bossJobArray", bosslist);
+			resultMap.put("tc58JobArray", tc58list);
+			RedisHelper.setSerialData("bossJobArray", bosslist);
+			RedisHelper.setSerialData("tc58JobArray", tc58list);
+
+			Jmodel.setMapData(resultMap);
+
+			Jmodel.setFlag(true);
 		}catch(Exception e){//查询数据异常时反馈给页面
 			e.printStackTrace();
 			log.error(e.getMessage());
 			Jmodel.setFlag(false);
-			Jmodel.setMessage("未查询到数据，请切换条件重试或者联系管理员");
+			Jmodel.setMessage("查询异常！！可能未查询出数据。");
 			return Jmodel;
 		}
 
@@ -189,13 +190,13 @@ class MainController{
 				}
 			}
 			System.out.println(surl);
-			
+
 			return surl;
 		} catch (Throwable e) {
 			e.printStackTrace();
 			log.error("bossParamsHandle：  参数处理异常！");
 		}
-		
+
 		return "";
 	}
 

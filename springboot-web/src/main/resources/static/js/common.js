@@ -12,18 +12,20 @@
  * 职位搜索按钮
  * @author yangsw
  */
-function jobSearch(pageNum){
+function jobSearch(){
 
 	var params = getPageFilterParams();
 
-	//大于1  说明是下方分页按钮的查询，页面将显示非第一页 数据
-	if(Number(pageNum) > 1){
-		params.page = pageNum;
-	}
+//	//大于1  说明是下方分页按钮的查询，页面将显示非第一页 数据
+//	if(Number(pageNum) > 1){
+//	params.page = pageNum;
+//	}
+	
+	$("div[class='alert alert-danger']").empty();
 
 	$.ajax({
 		type:"get",
-		url:"/main/searchJob",
+		url:"/web/main/searchJob",
 		data:params,
 		dataType:"json",
 		async:true,
@@ -31,38 +33,109 @@ function jobSearch(pageNum){
 			//如果出现异常，显示错误讯息，清空已查询出的数据和分页标签
 			if(data.flag == false){
 				//清空已经查询出的数据和下方的分页ul
-				$("#joblist,#pagination").empty();
+				$("#jobbox,#pagination").empty();
 				//显示错误讯息
-				$("#joblist").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
+				$("#jobbox").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
 				return;
 			}
 
-			if(data.mapData.list != null && data.mapData.list.length > 0 ){
-				changeJobData('boss_job_data',1,pageNum);//显示第一页数据，默认显示Boss直聘页面
-				$("a[name='pagination_a']").first().parent().addClass("active");//选中第一页
-				$("#pagination").attr("pagenum",pageNum);//标识当前大页
-				$("#pagination").attr("datanum",1);//标识当前数据页码
+			var bossJob = data.mapData.bossJobArray;
+			var tc58Job = data.mapData.tc58JobArray;
+
+			if(bossJob != null && bossJob.length > 0 ){
+
+				setJobData("bossJob",bossJob);
+
 			}else{
-				alert("查询异常，请稍后再试！");
+				$("#jobbox").append("<div class=\"alert alert-danger\">boss直聘未能正常查询出</div>");
 			}
 		}
 
 	});
 }
 
+function setJobData(divid,joblist){
+	debugger;
+	if(joblist != null){
+		//置入jquery缓存
+		$('#'+divid).data(divid,joblist);
+
+		var job_start_tag = "";
+		var info_title_tag = "";
+		var job_salary_address_tag = "";
+		var company_start_tag = "";
+		var company_tag = "";
+		var company_info_tag = "";
+
+		$("#"+divid).empty();//数据变更前先清空数据div
+		$.each(joblist,function(i,job){
+			if(i < 10){
+				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
+				info_title_tag = "<div class=\"info-title\"><a class=\"cursortag\" link=\""+job.job_link+"\">"+job.title+"</a>"+
+				"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
+
+				job_salary_address_tag = "<div class=\"job-salary\">"+job.salary+"<span class=\"job-address\">"+job.address+"</span></div></div>";
+
+				company_start_tag = "<div class=\"job-company\">";
+				company_tag = "<div class=\"info-title-right\"><a class=\"cursortag\" link=\""+job.company.link+"\">"+job.company.name+"</a>" +
+				"<span class=\"typeword\">"+job.job_time+"</span></div>";
+
+//				var otherInfo = job.company.otherInfo;
+
+				company_info_tag = "<div class=\"company-info\"><span >"+job.company.otherInfo[0]+"<em class=\"vline\"></em>"+job.company.otherInfo[1]+"<em class=\"vline\">" +
+				"</em>"+job.company.otherInfo[2]+"</span></div></div></div>";
+
+				$("#"+divid).append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
+
+			}
+		});
+		
+		//左侧附加菜单选中
+		$("#affixul").children().first().addClass("active");
+		$("#"+divid).attr({"pn":"1","show":"true","cachekey":"bossJobArray"});//当前数据页码、show标识此页面显示此div、cachekey为redis数据key
+		//初始化下方页码
+		initPagination(joblist.length);
+	}
+}
+
+/***
+ * 刚查出的数据初始化页码
+ */
+function initPagination(datalength){
+	$("#pagination").empty();
+	var li_a_start = "";
+
+	//		左边<<
+	li_a_start += "<li><a id=\"pagination_left\" class=\"cursortag\">&laquo;</a></li>";
+
+//	var numStart = 2*pageNum+(pageNum-2);
+	
+	var pagenums = datalength/10;
+	datalength%10 > 0 ? pagenums++ : pagenums;
+	var i = 1;
+	while(i <= pagenums){
+		li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\">"+i+"</a></li>";
+		i++;
+	}
+
+	//更多页数据按钮
+	li_a_start += "<li><a id=\"pagination_m\" class=\"cursortag\">...</a></li>";
+	//		右边>>
+	li_a_start += "<li><a id=\"pagination_right\" class=\"cursortag\">&raquo;</a></li>";
+
+
+	$("#pagination").append(li_a_start);
+}
+
+
 /***
  * 职位数据拼接展示
  * 
  * @author yangsw
- * @param idkey 附加导航栏的id,也是redis中数据的key
- * @param defaultNum 默认显示第几页数据
- * @param pageNum  原頁面的第几大页
  */
-function changeJobData(idkey,defaultNum,pageNum){
+function changeJobData(divid,cachekey,pagenum){
 
-	var joblist = getSerialData(idkey);//获取数据
-	var length = joblist.length;
-	var paginationNum = Math.ceil(length/10);//页数,获取此值也为了下方分页按钮的动态生成
+	var joblist = $('#'+divid).data(divid);;//获取数据
 
 	if(joblist != null){
 
@@ -74,12 +147,12 @@ function changeJobData(idkey,defaultNum,pageNum){
 		var company_info_tag = "";
 
 		//数据分页
-		var dataBegin = (defaultNum-1)*10;
-		var dataEnd = defaultNum * 10;
+		var dataBegin = (pagenum-1)*10;
+		var dataEnd =  pagenum * 10 - 1;//数据最开始从0开始
 
-		$("#joblist").empty();//数据变更前先清空数据div
+		$("#"+divid).empty();//数据变更前先清空数据div
 		$.each(joblist,function(i,job){
-			if(i >= dataBegin && i <= dataEnd){
+			if(i >= dataBegin && i <= dataEnd){//i >= 10 && i <= 19
 				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
 				info_title_tag = "<div class=\"info-title\"><a class=\"cursortag\" link=\""+job.job_link+"\">"+job.title+"</a>"+
 				"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
@@ -89,19 +162,16 @@ function changeJobData(idkey,defaultNum,pageNum){
 				company_start_tag = "<div class=\"job-company\">";
 				company_tag = "<div class=\"info-title-right\"><a class=\"cursortag\" link=\""+job.company.link+"\">"+job.company.name+"</a>" +
 				"<span class=\"typeword\">"+job.job_time+"</span></div>";
-				
+
 //				var otherInfo = job.company.otherInfo;
-				
+
 				company_info_tag = "<div class=\"company-info\"><span >"+job.company.otherInfo[0]+"<em class=\"vline\"></em>"+job.company.otherInfo[1]+"<em class=\"vline\">" +
 				"</em>"+job.company.otherInfo[2]+"</span></div></div></div>";
-				
-				$("#joblist").append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
 
-				//左侧附加菜单选中
-				$("#"+idkey).parent().addClass("active");
-
+				$("#"+divid).append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
 			}
 		});
+		$("#"+divid).attr({"pn":pagenum,"show":"true","cachekey":cachekey});//当前数据页码、show标识此页面显示此div、cachekey为redis数据key
 
 		//页面是否已经生成过分页按钮, 只是为了切换分页数据，则下方分页按钮不再生成
 		if($("#pagination:has(li)").length==0 || pageNum >= 1){
@@ -111,6 +181,71 @@ function changeJobData(idkey,defaultNum,pageNum){
 
 	}
 }
+
+
+
+
+/***
+ * 职位数据拼接展示
+ * 
+ * @author yangsw
+ * @param idkey 附加导航栏的id,也是redis中数据的key
+ * @param defaultNum 默认显示第几页数据
+ * @param pageNum  原頁面的第几大页
+ */
+//function changeJobData2(idkey,defaultNum,pageNum){
+//
+//	var joblist = getSerialData(idkey);//获取数据
+//	var length = joblist.length;
+//	var paginationNum = Math.ceil(length/10);//页数,获取此值也为了下方分页按钮的动态生成
+//
+//	if(joblist != null){
+//
+//		var job_start_tag = "";
+//		var info_title_tag = "";
+//		var job_salary_address_tag = "";
+//		var company_start_tag = "";
+//		var company_tag = "";
+//		var company_info_tag = "";
+//
+//		//数据分页
+//		var dataBegin = (defaultNum-1)*10;
+//		var dataEnd = defaultNum * 10;
+//
+//		$("#joblist").empty();//数据变更前先清空数据div
+//		$.each(joblist,function(i,job){
+//			if(i >= dataBegin && i <= dataEnd){
+//				job_start_tag = "<div class=\"job-item\"><div class=\"job-info\">";
+//				info_title_tag = "<div class=\"info-title\"><a class=\"cursortag\" link=\""+job.job_link+"\">"+job.title+"</a>"+
+//				"<span class=\"job-exp-degree\">"+job.exp+"<em class=\"vline\"></em>"+job.degree+"</span></div>";
+//
+//				job_salary_address_tag = "<div class=\"job-salary\">"+job.salary+"<span class=\"job-address\">"+job.address+"</span></div></div>";
+//
+//				company_start_tag = "<div class=\"job-company\">";
+//				company_tag = "<div class=\"info-title-right\"><a class=\"cursortag\" link=\""+job.company.link+"\">"+job.company.name+"</a>" +
+//				"<span class=\"typeword\">"+job.job_time+"</span></div>";
+//
+////				var otherInfo = job.company.otherInfo;
+//
+//				company_info_tag = "<div class=\"company-info\"><span >"+job.company.otherInfo[0]+"<em class=\"vline\"></em>"+job.company.otherInfo[1]+"<em class=\"vline\">" +
+//				"</em>"+job.company.otherInfo[2]+"</span></div></div></div>";
+//
+//				$("#joblist").append(job_start_tag+info_title_tag+job_salary_address_tag+company_start_tag+company_tag+company_info_tag);
+//
+//				//左侧附加菜单选中
+//				$("#"+idkey).parent().addClass("active");
+//
+//			}
+//		});
+//
+//		//页面是否已经生成过分页按钮, 只是为了切换分页数据，则下方分页按钮不再生成
+//		if($("#pagination:has(li)").length==0 || pageNum >= 1){
+//			//动态拼接分页栏位显示		数据页数和当前大页
+//			paginationAppend(paginationNum,pageNum);
+//		}
+//
+//	}
+//}
 
 /***
  * 查询前获取选择的条件进行参数处理
@@ -187,8 +322,8 @@ function initPageData(){
 function pageAffixAppend(){
 
 	var li_boss = "<li><a id=\"boss_job_data\" class=\"cursortag\" name=\"left_affix\" >Boss直聘</a></li>";
-	var li_zhilian = "<li><a id=\"zhilian_job_data\" class=\"cursortag\" name=\"left_affix\" >智联招聘(暂未开放)</a></li>";
-	var li_51 = "<li><a id=\"51_job_data\" class=\"cursortag\" name=\"left_affix\" >51job(暂未开放)</a></li>";
+	var li_zhilian = "<li><a id=\"zhilian_job_data\" class=\"cursortag\" name=\"left_affix\" >58同城</a></li>";
+	var li_51 = "<li><a id=\"51_job_data\" class=\"cursortag\" name=\"left_affix\" >智联卓聘</a></li>";
 
 	$("#affixul").append(li_boss+li_zhilian+li_51);
 
@@ -200,7 +335,7 @@ function pageAffixAppend(){
  * @param pageNum 当前第几大页
  * @param dataNum List中第几页的数据
  */
-function paginationAppend(paginationNum,pageNum){
+function paginationAppend(){
 	var li_a_start = "";
 
 	if(paginationNum > 1){

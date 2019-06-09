@@ -54,25 +54,18 @@ $(document).ready(function() {
 		
 		//动态切换点击时候的显示状态
 		changeActive(this,"pagination");
-
-		//点击的数据页码
-		var num = $(this).attr("datanum");
 		
-		//左侧导航栏位选中的数据方
-		var idkey = "";
-		$("a[name='left_affix']").each(function(i,ele){
+		var showdomid = $("div[show='true']").first().attr("id");
+		var cachekey = $("div[show='true']").first().attr("cachekey");
+		var pagenum = "";
+		$("a[name='pagination_a']").each(function(i,ele){
 			if($(this).parent().hasClass("active")){
-				idkey = this.id;
+				pagenum = $(this).text();
 			}
 		});
 		
-		var pageNum = $("#pagination").attr("pagenum");
-		$("#pagination").attr("datanum",num)
-		
 		//切换分页数据
-		changeJobData(idkey,num,pageNum);
-		
-		$("#pagination_a_"+num).parent().addClass("active");//选中当前页
+		changeJobData(showdomid,cachekey,pagenum);
 		
 	});
 	
@@ -115,6 +108,7 @@ $(document).ready(function() {
 		$("#pagination_a_"+num).parent().addClass("active");//选中当前页
 		
 	});
+	
 	//分页栏位 右箭头 按钮
 	$("#pagination").on("click","#pagination_right",function(){
 		var pageNum = $("#pagination").attr("pagenum");//当前Redis中的数据页
@@ -149,6 +143,8 @@ $(document).ready(function() {
 		$("#pagination_a_"+num).parent().addClass("active");//选中当前页
 		
 	});
+	
+	
 	
 	/**
 	 * 页面下方分页按钮点击函数
