@@ -97,6 +97,51 @@ class MainController{
 
 		return Jmodel;
 	}
+	
+	@GetMapping("/SingleSearchJob")
+	public JSONReturn SingleSearch(HttpServletRequest request){
+		String showid = request.getParameter("showid");
+		
+		String url = "";
+		if("boss".equals(showid)){
+			url = bossParamsHandle(request);
+		}
+		
+		JSONReturn Jmodel =new JSONReturn();
+
+		//		long start = System.currentTimeMillis();
+
+		List<Object> joblist = new ArrayList<Object>();
+
+		try{
+			//boss直聘查询
+			joblist = boss_service.getBossPageJob(url);
+			
+			if(joblist == null){
+				joblist = new ArrayList<Object>();
+			}
+
+			Map<String,Object> resultMap = new HashMap<>();
+			
+			resultMap.put(showid+"JobArray", joblist);
+			RedisHelper.setSerialData(showid+"JobArray", joblist);
+
+			Jmodel.setMapData(resultMap);
+
+			Jmodel.setFlag(true);
+		}catch(Exception e){//查询数据异常时反馈给页面
+			e.printStackTrace();
+			log.error(e.getMessage());
+			Jmodel.setFlag(false);
+			Jmodel.setMessage("查询异常！！可能未查询出数据。");
+			return Jmodel;
+		}
+		
+		return Jmodel;
+	}
+	
+	
+	
 
 	/***
 	 * 获取页面参数，最终返回拼接的url
@@ -189,7 +234,7 @@ class MainController{
 					surl = surl+"?page="+page;
 				}
 			}
-			System.out.println(surl);
+			System.out.println("本次获取的url: "+surl);
 
 			return surl;
 		} catch (Throwable e) {
