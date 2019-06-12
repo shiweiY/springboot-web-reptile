@@ -25,7 +25,7 @@ function jobSearch(){
 		url:"/web/main/searchJob",
 		data:params,
 		dataType:"json",
-		async:true,
+		async:false,
 		success:function(data){
 			//如果出现异常，显示错误讯息，清空已查询出的数据和分页标签
 			if(data.flag == false){
@@ -38,8 +38,8 @@ function jobSearch(){
 			var tc58Job = data.mapData.tc58JobArray;
 
 			if(bossJob != null && bossJob.length > 0 ){
-				setJobData("boss",bossJob);
-				$('#jobbox').data("boss-server-page","1");//源页面的页码 比如boss直聘
+				setJobData("boss","bossJobArray",bossJob);
+				$('#jobbox').data("boss-server-page","");//源页面的页码 比如boss直聘
 			}else{
 				$("#jobbox").append("<div class=\"alert alert-danger\">boss直聘未能正常查询出</div>");
 			}
@@ -48,11 +48,11 @@ function jobSearch(){
 	});
 }
 
-function setJobData(divid,joblist){
+function setJobData(divid,cachekey,joblist){
 
 	if(joblist != null){
 		//置入jquery缓存
-		$('#'+divid).data(divid,joblist);
+		$('#'+divid).data(cachekey,joblist);
 
 		$("#"+divid).empty();//数据变更前先清空数据div
 
@@ -61,7 +61,6 @@ function setJobData(divid,joblist){
 		//左侧附加菜单选中
 		$("#affixul").children().first().addClass("active");
 		$("#boxinfo").attr({"pn":"1","show":divid,"cachekey":divid+"JobArray"})//当前显示数据的信息
-		$("#"+divid).attr("show","true");//当前数据页码、show标识此页面显示此div、cachekey为redis数据key
 		//初始化下方页码
 		initPagination(joblist.length);
 	}
@@ -75,23 +74,17 @@ function setJobData(divid,joblist){
  */
 function changeJobData(divid,cachekey,pagenum){
 
-	var joblist = $('#'+divid).data(divid);;//获取数据
+	var joblist = $('#'+divid).data(cachekey);//获取数据
+	
+//	console.log("changeJobData中获取数据:"+joblist);
 
 	if(joblist != null){
 
 		$("#"+divid).empty();//数据变更前先清空数据div
 
 		jobDomAppend(joblist,divid,pagenum);//动态拼接数据dom
-
-		$("#"+divid).attr("show","true");//当前数据页码、show标识此页面显示此div、cachekey为redis数据key
-		$("#boxinfo").attr({"pn":pagenum,"cachekey":divid+"JobArray"})//当前显示数据的信息
-
-		//页面是否已经生成过分页按钮, 只是为了切换分页数据，则下方分页按钮不再生成
-//		if($("#pagination:has(li)").length==0 || pageNum >= 1){
-//		//动态拼接分页栏位显示		数据页数和当前大页
-//		paginationAppend(paginationNum,pageNum);
-//		}
-
+		
+		$("#boxinfo").attr({"pn":pagenum,"show":divid,"cachekey":cachekey})//当前显示数据的信息
 	}
 }
 
@@ -114,7 +107,7 @@ function jobDomAppend(joblist,divid,pagenum){
 	var dataBegin = 0;
 	var dataEnd =  9;
 
-	if(pagenum != 0){
+	if(pagenum > 1){
 		dataBegin = (pagenum-1)*10;
 		dataEnd =  pagenum * 10 - 1;//数据最开始从0开始
 	}
@@ -146,21 +139,27 @@ function paginationSearch(){
 	
 	var showid = $("#boxinfo").attr("show");
 	var server_page = $('#jobbox').data(showid+'-server-page');
+	if(server_page == ""){
+		server_page = 1;
+	}
 
+	var prevpn = $('#pagination_m').data(showid+"_prevpn");
 	var params = getPageParams();
-	params.page = Number(server_page)+2;//新页码
+	params.page = Number(server_page)+1;//新页码
 	params.showid = showid;
+	var cachekey = showid+"JobArray"+params.page;
 
 	$("div[class='alert alert-danger']").remove();
 	//清空已经查询出的数据和下方的分页ul
-	$("#jobbox,#pagination").empty();
+//	$("#jobbox,#pagination").empty();
 
+	var joblist;
 	$.ajax({
 		type:"get",
 		url:"/web/main/SingleSearchJob",
 		data:params,
 		dataType:"json",
-		async:true,
+		async:false,
 		success:function(data){
 
 			if(data.flag == false){
@@ -169,28 +168,32 @@ function paginationSearch(){
 				return;
 			}
 
-			var joblist;
+			
 			if(showid == "boss"){
 				joblist = data.mapData.bossJobArray;
 			}else if(showid == "tc58"){
 				joblist = data.mapData.tc58JobArray;
 			}
+			
 
 			if(joblist != null && joblist.length > 0 ){
-
+				$('#'+showid).data(cachekey,joblist);
+				
 //				var pn = $("#boxinfo").attr("pn");
-
-				changeJobData(showid,joblist,"1");
-				$.data(showid+"-server-page",params.page);//源页面页码 比如boss直聘
+				changeJobData(showid,cachekey,"1");
+				$('#jobbox').data(showid+'-server-page',params.page);//源页面页码 比如boss直聘
 			}else{
 				$("#jobbox").append("<div class=\"alert alert-danger\">未能正常查询出数据！</div>");
 			}
 		}
 
 	});
-
+	
+	var startpn = Number(prevpn)+1;
+	var endpn = joblist.length / 10;
+	
 	//更新下方页码
-	paginationAppend();
+	paginationAppend(startpn,endpn);
 
 }
 
@@ -353,7 +356,7 @@ function initPagination(datalength){
 	var li_a_start = "";
 
 	//		左边<<
-	li_a_start += "<li><a id=\"pagination_left\" class=\"cursortag\">&laquo;</a></li>";
+	li_a_start += "<li id=\"pagination_left_li\"><a id=\"pagination_left\" class=\"cursortag\">&laquo;</a></li>";
 
 //	var numStart = 2*pageNum+(pageNum-2);
 
@@ -361,17 +364,18 @@ function initPagination(datalength){
 	datalength%10 > 0 ? pagenums++ : pagenums;
 	var i = 1;
 	while(i <= pagenums){
-		li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\">"+i+"</a></li>";
+		li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\" apn="+i+">"+i+"</a></li>";
 		i++;
 	}
 
 	//更多页数据按钮
 	li_a_start += "<li id=\"pagination_m_li\"><a id=\"pagination_m\" class=\"cursortag\">...</a></li>";
 	//		右边>>
-	li_a_start += "<li><a id=\"pagination_right\" class=\"cursortag\">&raquo;</a></li>";
+	li_a_start += "<li id=\"pagination_right_li\"><a id=\"pagination_right\" class=\"cursortag\">&raquo;</a></li>";
 
 
 	$("#pagination").append(li_a_start);
+	$("a[name='pagination_a']").first().parent().addClass("active");
 }
 
 /***
@@ -380,28 +384,30 @@ function initPagination(datalength){
  * @param pageNum 当前第几大页
  * @param dataNum List中第几页的数据
  */
-function paginationAppend(){
+function paginationAppend(startpn,endpn){
 	var li_a_start = "";
 
 	$("#pagination").empty();
 
 	//		左边<<
-	li_a_start += "<li><a id=\"pagination_left\" class=\"cursortag\">&laquo;</a></li>";
+	li_a_start += "<li id=\"pagination_left_li\"><a id=\"pagination_left\" class=\"cursortag\">&laquo;</a></li>";
 
-	var numStart = 2*pageNum+(pageNum-2);
-	var i = 1;
-	while(i <= paginationNum){
-		li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\" dataNum=\""+i+"\" pageNum=\""+pageNum+"\" class=\"cursortag\">"+numStart+"</a></li>";
-		numStart += 1;
+//	var numStart = 2*pageNum+(pageNum-2);
+	var i = startpn;
+	var j = 1;
+	while(j <= endpn){
+		li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\" class=\"cursortag\" apn="+j+">"+i+"</a></li>";
 		i++;
+		j++;
 	}
 
 	//更多页数据按钮
-	li_a_start += "<li><a id=\"pagination_m\" class=\"cursortag\">...</a></li>";
+	li_a_start += "<li id=\"pagination_m_li\"><a id=\"pagination_m\" class=\"cursortag\">...</a></li>";
 	//		右边>>
-	li_a_start += "<li><a id=\"pagination_right\" class=\"cursortag\">&raquo;</a></li>";
+	li_a_start += "<li id=\"pagination_right_li\"><a id=\"pagination_right\" class=\"cursortag\">&raquo;</a></li>";
 
 	$("#pagination").append(li_a_start);
+	$("a[name='pagination_a']").first().parent().addClass("active");
 }
 
 
@@ -425,7 +431,7 @@ function getSerialData(key){
 	if(key != null){
 		$.ajax({
 			type : "get",
-			url : "TransientData/getSerialData",
+			url : "web/TransientData/getSerialData",
 			data : {rediskey:key},
 			dataType : "json",
 			traditional:true,//通过ajax提交数组时，jquery深度序列化以适应php等,它会自动在所设定的参数后面增加中括号： [] 后台取值不便,traditional为true可防止深度序列化

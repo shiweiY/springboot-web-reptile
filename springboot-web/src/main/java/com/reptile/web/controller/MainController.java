@@ -101,6 +101,7 @@ class MainController{
 	@GetMapping("/SingleSearchJob")
 	public JSONReturn SingleSearch(HttpServletRequest request){
 		String showid = request.getParameter("showid");
+		String page = request.getParameter("page");//源页面页码
 		
 		String url = "";
 		if("boss".equals(showid)){
@@ -124,7 +125,7 @@ class MainController{
 			Map<String,Object> resultMap = new HashMap<>();
 			
 			resultMap.put(showid+"JobArray", joblist);
-			RedisHelper.setSerialData(showid+"JobArray", joblist);
+			RedisHelper.setSerialData(showid+"JobArray"+page, joblist);//redis中存放所有查询过的数据
 
 			Jmodel.setMapData(resultMap);
 
@@ -158,7 +159,7 @@ class MainController{
 			String salary = request.getParameter("salary");//薪资
 			String stage = request.getParameter("stage");//融资阶段
 			String scale = request.getParameter("scale");//公司规模
-			String page = request.getParameter("page");//公司规模
+			String page = request.getParameter("page");//源页面页码
 
 			String surl = "";
 

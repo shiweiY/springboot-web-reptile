@@ -12,7 +12,7 @@ import com.reptile.web.model.JSONReturn;
 import com.reptile.web.tech.cache.service.RedisHelper;
 
 @RestController
-@RequestMapping("/TransientData")
+@RequestMapping("/web/TransientData")
 public class TransientDataController {
 	
 //	@Autowired
