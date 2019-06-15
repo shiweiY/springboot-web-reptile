@@ -25,17 +25,12 @@ import com.reptile.web.service.FeignTc58Service;
 import com.reptile.web.tech.cache.service.RedisHelper;
 
 @RestController
-@RequestMapping("/web/main")
-class MainController{
+@RequestMapping("/web/controller/tc58")
+class WebTc58Controller{
 
-	private static final Logger log = LoggerFactory.getLogger(MainController.class);
+	private static final Logger log = LoggerFactory.getLogger(WebTc58Controller.class);
 
-	@Autowired
-	FeignBossService boss_service;
-
-	@Autowired
-	FeignLagouService lagou_service;
-
+//
 	@Autowired
 	FeignTc58Service tc58_service;
 
@@ -45,68 +40,14 @@ class MainController{
 	//不再使用springboot 集成的redis
 	//	@Autowired
 	//	RedisHelper redis;
-
-	//	static String url = "/c101010100/y_4-d_206-e_103/?ka=sel-salary-4";
-
-	@GetMapping("/searchJob")
-	public JSONReturn search(HttpServletRequest request){
-
-		//拼接boss直聘查询的url
-		String bossurl = bossParamsHandle(request);
-
-		JSONReturn Jmodel =new JSONReturn();
-
-		//		long start = System.currentTimeMillis();
-
-		List<Object> bosslist = new ArrayList<Object>();
-		List<Object> tc58list = new ArrayList<Object>();
-
-		try{
-			//boss直聘查询
-			bosslist = boss_service.getBossPageJob(bossurl);
-//			tc58list = tc58_service.get58TcPageJob("");
-			
-			if(bosslist == null){
-				bosslist = new ArrayList<Object>();
-			}
-			
-			if(tc58list == null){
-				tc58list = new ArrayList<Object>();
-			}
-			
-
-			Map<String,Object> resultMap = new HashMap<>();
-			
-			resultMap.put("bossJobArray", bosslist);
-			resultMap.put("tc58JobArray", tc58list);
-			RedisHelper.setSerialData("bossJobArray", bosslist);
-			RedisHelper.setSerialData("tc58JobArray", tc58list);
-
-			Jmodel.setMapData(resultMap);
-
-			Jmodel.setFlag(true);
-		}catch(Exception e){//查询数据异常时反馈给页面
-			e.printStackTrace();
-			log.error(e.getMessage());
-			Jmodel.setFlag(false);
-			Jmodel.setMessage("查询异常！！可能未查询出数据。");
-			return Jmodel;
-		}
-
-		//		List<Object> list2 = (List<Object>) RedisHelper.getSerialData("boss_job_data");
-
-		return Jmodel;
-	}
 	
-	@GetMapping("/SingleSearchJob")
+	@GetMapping("/searchJob")
 	public JSONReturn SingleSearch(HttpServletRequest request){
 		String showid = request.getParameter("showid");
 		String page = request.getParameter("page");//源页面页码
 		
-		String url = "";
-		if("boss".equals(showid)){
-			url = bossParamsHandle(request);
-		}
+//		String url  = bossParamsHandle(request);
+		String url  = "";
 		
 		JSONReturn Jmodel =new JSONReturn();
 
@@ -116,7 +57,7 @@ class MainController{
 
 		try{
 			//boss直聘查询
-			joblist = boss_service.getBossPageJob(url);
+			joblist = tc58_service.get58TcPageJob(url);
 			
 			if(joblist == null){
 				joblist = new ArrayList<Object>();
@@ -124,7 +65,7 @@ class MainController{
 
 			Map<String,Object> resultMap = new HashMap<>();
 			
-			resultMap.put(showid+"JobArray", joblist);
+			resultMap.put("resultJobArray", joblist);
 			RedisHelper.setSerialData(showid+"JobArray"+page, joblist);//redis中存放所有查询过的数据
 
 			Jmodel.setMapData(resultMap);
@@ -134,7 +75,7 @@ class MainController{
 			e.printStackTrace();
 			log.error(e.getMessage());
 			Jmodel.setFlag(false);
-			Jmodel.setMessage("查询异常！！可能未查询出数据。");
+			Jmodel.setMessage("58同城查询异常！！可能未查询出数据。");
 			return Jmodel;
 		}
 		

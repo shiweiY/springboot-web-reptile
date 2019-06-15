@@ -30,7 +30,7 @@ public class Tc58Controller {
 	@PostMapping("/getTc58Job")
 	public List<Job> getLagouPageJob(@RequestParam("url") String url){
 		
-		url="https://hz.58.com/job/";
+		url="https://bj.58.com/job/";
 		
 //		Document doc = (Document) Jsoup.connect("https://www.lagou.com/"+url).get();
 		
@@ -45,6 +45,8 @@ public class Tc58Controller {
 			
 			if(response.getStatusLine().getStatusCode() == 200){
 				String results = EntityUtils.toString(response.getEntity(),"UTF-8");
+				
+//				System.out.println(results);
 				
 				if(results == null || results.isEmpty()){
 					LOG.warn("GET 获取页面信息为空！ ："+url);

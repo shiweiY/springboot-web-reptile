@@ -5,6 +5,8 @@
  * @date 2019-3
  */
 
+var mpath = "/web/controller";
+
 
 /***
  * 页面事件部分 ---------------------------------------------------------------------------------------
@@ -14,15 +16,41 @@
  */
 function jobSearch(){
 
+	var showid = "boss";
+//	var showid = "tc58";
+	
+	
 	var params = getPageParams();
-
+	params.page = "";
+	params.showid = showid;
+	
+	var bossjoblist = ajaxGetSearch(mpath+"/boss/searchJob",params);
+	var tc58joblist = ajaxGetSearch(mpath+"/tc58/searchJob",params);
+	
 	$("div[class='alert alert-danger']").remove();
-	//清空已经查询出的数据和下方的分页ul
-//	$("#jobbox,#pagination").empty();
+	
+	changeShowBox(showid);
+	
+	if(bossjoblist != null && bossjoblist.length > 0 ){
+		setJobData("boss","bossJobArray",bossjoblist);
+		$('#jobbox').data("boss-server-page","");//源页面的页码 比如boss直聘
+	}
+	if(tc58joblist != null && tc58joblist.length > 0 ){
+		setJobData("tc58","tc58JobArray",tc58joblist);
+		$('#jobbox').data("tc58-server-page","");//源页面的页码 比如58同城
+	}
+	
 
+	
+}
+
+function ajaxGetSearch(curl,params){
+	
+	var resultJob;
+	
 	$.ajax({
 		type:"get",
-		url:"/web/main/searchJob",
+		url:curl,
 		data:params,
 		dataType:"json",
 		async:false,
@@ -34,18 +62,13 @@ function jobSearch(){
 				return;
 			}
 
-			var bossJob = data.mapData.bossJobArray;
-			var tc58Job = data.mapData.tc58JobArray;
-
-			if(bossJob != null && bossJob.length > 0 ){
-				setJobData("boss","bossJobArray",bossJob);
-				$('#jobbox').data("boss-server-page","");//源页面的页码 比如boss直聘
-			}else{
-				$("#jobbox").append("<div class=\"alert alert-danger\">boss直聘未能正常查询出</div>");
-			}
+			resultJob = data.mapData.resultJobArray;
 		}
 
 	});
+	
+	return resultJob;
+	
 }
 
 function setJobData(divid,cachekey,joblist){
@@ -60,9 +83,14 @@ function setJobData(divid,cachekey,joblist){
 
 		//左侧附加菜单选中
 		$("#affixul").children().first().addClass("active");
-		$("#boxinfo").attr({"pn":"1","show":divid,"cachekey":divid+"JobArray"})//当前显示数据的信息
-		//初始化下方页码
-		initPagination(joblist.length);
+		
+		var showid = $("#boxinfo").attr("show");
+		if(showid == null || showid == ""){
+			$("#boxinfo").attr({"pn":"1","show":divid,"cachekey":divid+"JobArray"})//当前显示数据的信息
+			//初始化下方页码
+			initPagination(joblist.length);
+		}
+		
 	}
 }
 
@@ -81,11 +109,13 @@ function changeJobData(divid,cachekey,pagenum){
 	if(joblist != null){
 
 		$("#"+divid).empty();//数据变更前先清空数据div
-
+		
 		jobDomAppend(joblist,divid,pagenum);//动态拼接数据dom
 		
 		$("#boxinfo").attr({"pn":pagenum,"show":divid,"cachekey":cachekey})//当前显示数据的信息
 	}
+	
+	return joblist;
 }
 
 /***
@@ -143,51 +173,63 @@ function paginationSearch(){
 		server_page = 1;
 	}
 
-	var prevpn = $('#pagination_m').data(showid+"_prevpn");
+	var prevpn = $('#jobbox').data(showid+"_prevpn");
 	var params = getPageParams();
 	params.page = Number(server_page)+1;//新页码
 	params.showid = showid;
 	var cachekey = showid+"JobArray"+params.page;
 
 	$("div[class='alert alert-danger']").remove();
-	//清空已经查询出的数据和下方的分页ul
-//	$("#jobbox,#pagination").empty();
+	
+	var url= mpath+"/"+showid+"/searchJob";
 
-	var joblist;
-	$.ajax({
-		type:"get",
-		url:"/web/main/SingleSearchJob",
-		data:params,
-		dataType:"json",
-		async:false,
-		success:function(data){
-
-			if(data.flag == false){
-				//显示错误讯息
-				$("#jobbox").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
-				return;
-			}
-
-			
-			if(showid == "boss"){
-				joblist = data.mapData.bossJobArray;
-			}else if(showid == "tc58"){
-				joblist = data.mapData.tc58JobArray;
-			}
-			
-
-			if(joblist != null && joblist.length > 0 ){
-				$('#'+showid).data(cachekey,joblist);
-				
-//				var pn = $("#boxinfo").attr("pn");
-				changeJobData(showid,cachekey,"1");
-				$('#jobbox').data(showid+'-server-page',params.page);//源页面页码 比如boss直聘
-			}else{
-				$("#jobbox").append("<div class=\"alert alert-danger\">未能正常查询出数据！</div>");
-			}
-		}
-
-	});
+	var joblist = ajaxGetSearch(url,params);
+	
+	if(joblist != null && joblist.length > 0 ){
+		$('#'+showid).data(cachekey,joblist);
+		
+//		var pn = $("#boxinfo").attr("pn");
+		changeJobData(showid,cachekey,"1");
+		$('#jobbox').data(showid+'-server-page',params.page);//源页面页码 比如boss直聘
+	}else{
+		$("#jobbox").append("<div class=\"alert alert-danger\">未能正常查询出数据！</div>");
+	}
+//	
+//	
+//	$.ajax({
+//		type:"get",
+//		url:"/web/main/SingleSearchJob",
+//		data:params,
+//		dataType:"json",
+//		async:false,
+//		success:function(data){
+//
+//			if(data.flag == false){
+//				//显示错误讯息
+//				$("#jobbox").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
+//				return;
+//			}
+//
+//			
+//			if(showid == "boss"){
+//				joblist = data.mapData.bossJobArray;
+//			}else if(showid == "tc58"){
+//				joblist = data.mapData.tc58JobArray;
+//			}
+//			
+//
+//			if(joblist != null && joblist.length > 0 ){
+//				$('#'+showid).data(cachekey,joblist);
+//				
+////				var pn = $("#boxinfo").attr("pn");
+//				changeJobData(showid,cachekey,"1");
+//				$('#jobbox').data(showid+'-server-page',params.page);//源页面页码 比如boss直聘
+//			}else{
+//				$("#jobbox").append("<div class=\"alert alert-danger\">未能正常查询出数据！</div>");
+//			}
+//		}
+//
+//	});
 	
 	var startpn = Number(prevpn)+1;
 	var endpn = joblist.length / 10;
@@ -337,9 +379,9 @@ function initPageData(){
  */
 function pageAffixAppend(){
 
-	var li_boss = "<li><a id=\"boss_job_data\" class=\"cursortag\" name=\"left_affix\" >Boss直聘</a></li>";
-	var li_zhilian = "<li><a id=\"zhilian_job_data\" class=\"cursortag\" name=\"left_affix\" >58同城</a></li>";
-	var li_51 = "<li><a id=\"51_job_data\" class=\"cursortag\" name=\"left_affix\" >智联卓聘</a></li>";
+	var li_boss = "<li><a id=\"boss_affix\" class=\"cursortag\" name=\"left_affix\" servername=\"boss\" >Boss直聘</a></li>";
+	var li_zhilian = "<li><a id=\"tc58_affix\" class=\"cursortag\" name=\"left_affix\" servername=\"tc58\" >58同城</a></li>";
+	var li_51 = "<li><a id=\"zlzp_affix\" class=\"cursortag\" name=\"left_affix\" servername=\"zlzp\" >智联卓聘</a></li>";
 
 	$("#affixul").append(li_boss+li_zhilian+li_51);
 
@@ -410,6 +452,12 @@ function paginationAppend(startpn,endpn){
 	$("a[name='pagination_a']").first().parent().addClass("active");
 }
 
+
+function changeShowBox(showid){
+	
+	$("#jobbox").find("div[name='jobcontent']").not("#"+showid).hide();
+	$("#"+showid).show();
+}
 
 
 

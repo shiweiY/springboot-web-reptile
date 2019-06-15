@@ -12,14 +12,19 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.reptile.boss.controller.BossController;
 
 public class HttpClientUtil {
-	
+	private static final Logger log = LoggerFactory.getLogger(HttpClientUtil.class);
+
 	private static final String ADDRESS = "https://www.zhipin.com";
-	
+
 	private static CloseableHttpClient client = HttpClients.createDefault();
-	
-	
+
+
 	/**
 	 * http get请求
 	 * @param uriget
@@ -28,30 +33,37 @@ public class HttpClientUtil {
 	 */
 	public static CloseableHttpResponse sendHttpGet(String uriget,String user_agent) throws Exception {
 		URIBuilder ubuilder = new URIBuilder(ADDRESS+uriget);
-		
+
 		URI uri = ubuilder.build();
 		System.out.println("请求地址:"+uri.toString());
-		
+
 		//整理请求头
 		List<Header> lheader = getListHeader(uriget,user_agent);
-		
+
 		HttpGet doGet = new HttpGet(uri);
 		for (Header header : lheader) {
 			doGet.addHeader(header);
 		}
-
-		CloseableHttpResponse response = client.execute(doGet);
 		
-		return response;
+		
+		try{
+
+			CloseableHttpResponse response = client.execute(doGet);
+			return response;
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error("httpClient发起请求异常: "+doGet.getMethod()+" "+uri.toString());
+			return null;
+		}
 	}
-	
-	
+
+
 	/****
 	 * 根据请求路径整理请求头
 	 * 
 	 * @param String 
 	 */
-	
+
 	public static List<Header> getListHeader(String uri,String user_agent) {
 		List<Header> lheader = new ArrayList<Header>();
 		lheader.add(new BasicHeader(HttpHeaders.ACCEPT,"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"));
@@ -66,13 +78,13 @@ public class HttpClientUtil {
 		//			lheader.add(new BasicHeader(HttpHeaders.HOST,"60.250.147.59"));
 		//			lheader.add(new BasicHeader("Origin","http://60.250.147.59"));
 		lheader.add(new BasicHeader(HttpHeaders.REFERER,ADDRESS+uri));
-		
+
 		lheader.add(new BasicHeader(HttpHeaders.USER_AGENT,user_agent));
 		lheader.add(new BasicHeader("DNT","1"));
-		
+
 		return lheader;
 	}
-	
-	
+
+
 }
 
