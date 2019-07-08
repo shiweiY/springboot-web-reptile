@@ -16,32 +16,41 @@ var mpath = "/web/controller";
  */
 function jobSearch(){
 
-	var showid = "boss";
-//	var showid = "tc58";
+	var searchId = new Array("boss");
 	
+	var timestart=new Date().getTime();
 	
 	var params = getPageParams();
 	params.page = "";
-	params.showid = showid;
-	
-	var bossjoblist = ajaxGetSearch(mpath+"/boss/searchJob",params);
-	var tc58joblist = ajaxGetSearch(mpath+"/tc58/searchJob",params);
 	
 	$("div[class='alert alert-danger']").remove();
-	
-	changeShowBox(showid);
-	
-	if(bossjoblist != null && bossjoblist.length > 0 ){
-		setJobData("boss","bossJobArray",bossjoblist);
-		$('#jobbox').data("boss-server-page","");//源页面的页码 比如boss直聘
-	}
-	if(tc58joblist != null && tc58joblist.length > 0 ){
-		setJobData("tc58","tc58JobArray",tc58joblist);
-		$('#jobbox').data("tc58-server-page","");//源页面的页码 比如58同城
-	}
-	
+	$.each(searchId,function(i,id){
+		params.showid = id;
+		
+		var url = mpath+"/"+id+"/searchJob";
 
+		var joblist;
+		if(i != 0){//非第一个采用异步查询
+			joblist = ajaxGetSearch(url,params);//true 异步
+		}else{
+			joblist = ajaxGetSearch(url,params);//false 同步
+			
+			changeShowBox(id);
+			$("#boxinfo").attr({"pn":"1","show":id,"cachekey":id+"JobArray"})//当前显示数据的信息
+			//初始化下方页码
+			initPagination(joblist.length);
+		}
+		
+		if(joblist != null && joblist.length > 0 ){
+			setJobData(id,id+"JobArray",joblist);
+			$('#jobbox').data(id+"-server-page","");//源页面的页码 比如boss直聘
+		}
+		
+		
+	});
 	
+	var timeend=new Date().getTime();
+	console.log("本次查询共耗时: "+(Number(timeend)-Number(timestart))+" ms");
 }
 
 function ajaxGetSearch(curl,params){
@@ -71,6 +80,35 @@ function ajaxGetSearch(curl,params){
 	
 }
 
+//异步查询
+function ajaxAsyncSearch(curl,params,id){
+	
+	$.ajax({
+		type:"get",
+		url:curl,
+		data:params,
+		dataType:"json",
+		async:true,
+		success:function(data){
+			//如果出现异常，显示错误讯息，清空已查询出的数据和分页标签
+			if(data.flag == false){
+				//显示错误讯息
+				$("#jobbox").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
+				return;
+			}
+
+			var joblist = data.mapData.resultJobArray;
+			
+			if(joblist != null && joblist.length > 0 ){
+				setJobData(id,id+"JobArray",joblist);
+				$('#jobbox').data(id+"-server-page","");//源页面的页码 比如boss直聘
+			}
+			
+		}
+
+	});
+}
+
 function setJobData(divid,cachekey,joblist){
 
 	if(joblist != null){
@@ -81,19 +119,9 @@ function setJobData(divid,cachekey,joblist){
 
 		jobDomAppend(joblist,divid,0);//动态拼接数据dom
 
-		//左侧附加菜单选中
-		$("#affixul").children().first().addClass("active");
-		
-		var showid = $("#boxinfo").attr("show");
-		if(showid == null || showid == ""){
-			$("#boxinfo").attr({"pn":"1","show":divid,"cachekey":divid+"JobArray"})//当前显示数据的信息
-			//初始化下方页码
-			initPagination(joblist.length);
-		}
 		
 	}
 }
-
 
 /***
  * 职位数据拼接展示
@@ -113,6 +141,10 @@ function changeJobData(divid,cachekey,pagenum){
 		jobDomAppend(joblist,divid,pagenum);//动态拼接数据dom
 		
 		$("#boxinfo").attr({"pn":pagenum,"show":divid,"cachekey":cachekey})//当前显示数据的信息
+	}else{
+		$("#pagination").empty();
+		alert("无数据，请重试！");
+//		$("#jobbox").append("<div class=\"alert alert-danger\">无数据，请重试！</div>");
 	}
 	
 	return joblist;
@@ -402,8 +434,8 @@ function initPagination(datalength){
 
 //	var numStart = 2*pageNum+(pageNum-2);
 
-	var pagenums = datalength/10;
-	datalength%10 > 0 ? pagenums++ : pagenums;
+	var pagenums = Math.ceil(datalength/10);
+//	datalength%10 > 0 ? pagenums++ : pagenums;
 	var i = 1;
 	while(i <= pagenums){
 		li_a_start += "<li><a id=\"pagination_a_"+i+"\" name=\"pagination_a\" apn="+i+">"+i+"</a></li>";
@@ -454,7 +486,8 @@ function paginationAppend(startpn,endpn){
 
 
 function changeShowBox(showid){
-	
+	//左侧附加菜单选中
+	$("#affixul").find("#"+showid+"_affix").parent().addClass("active");
 	$("#jobbox").find("div[name='jobcontent']").not("#"+showid).hide();
 	$("#"+showid).show();
 }

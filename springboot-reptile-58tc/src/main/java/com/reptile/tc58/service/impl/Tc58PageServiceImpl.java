@@ -39,8 +39,12 @@ public class Tc58PageServiceImpl implements Tc58PageService {
 			job.setJob_link(job_link);//原网页职位链接
 
 			//职位地址 span节点			 <span class="address">萧山区 </span>
-			Element addressEle = element.getElementsByClass("address").first();
-			String address = addressEle.text();
+			Elements addressEles = element.getElementsByClass("address");
+			String address="";
+			if(addressEles != null && !addressEles.isEmpty()){
+				Element addressEle = addressEles.first();
+				address = addressEle.text();
+			}
 			job.setAddress(address);//职位地址
 
 			//职位名称span节点	名称可能未拼接方式显示页面或者直接显示

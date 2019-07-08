@@ -51,7 +51,7 @@ class WebTc58Controller{
 		
 		JSONReturn Jmodel =new JSONReturn();
 
-		//		long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 
 		List<Object> joblist = new ArrayList<Object>();
 
@@ -71,6 +71,11 @@ class WebTc58Controller{
 			Jmodel.setMapData(resultMap);
 
 			Jmodel.setFlag(true);
+			
+			long end = System.currentTimeMillis();
+			
+			System.out.println("本次58同城后端处理时间: "+(end-start)+" ms");
+			
 		}catch(Exception e){//查询数据异常时反馈给页面
 			e.printStackTrace();
 			log.error(e.getMessage());

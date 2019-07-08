@@ -44,31 +44,36 @@ class WebBossController{
 	public JSONReturn SingleSearch(HttpServletRequest request){
 		String showid = request.getParameter("showid");
 		String page = request.getParameter("page");//源页面页码
-		
+
 		String url  = bossParamsHandle(request);
-		
+
 		JSONReturn Jmodel =new JSONReturn();
 
-		//		long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 
 		List<Object> joblist = new ArrayList<Object>();
 
 		try{
 			//boss直聘查询
 			joblist = boss_service.getBossPageJob(url);
-			
+
 			if(joblist == null){
 				joblist = new ArrayList<Object>();
 			}
 
 			Map<String,Object> resultMap = new HashMap<>();
-			
+
 			resultMap.put("resultJobArray", joblist);
 			RedisHelper.setSerialData(showid+"JobArray"+page, joblist);//redis中存放所有查询过的数据
 
 			Jmodel.setMapData(resultMap);
 
 			Jmodel.setFlag(true);
+
+			long end = System.currentTimeMillis();
+
+			System.out.println("本次boss直聘后端处理时间: "+(end-start)+" ms");
+
 		}catch(Exception e){//查询数据异常时反馈给页面
 			e.printStackTrace();
 			log.error(e.getMessage());
@@ -76,12 +81,12 @@ class WebBossController{
 			Jmodel.setMessage("Boss直聘查询异常！！可能未查询出数据。");
 			return Jmodel;
 		}
-		
+
 		return Jmodel;
 	}
-	
-	
-	
+
+
+
 
 	/***
 	 * 获取页面参数，最终返回拼接的url

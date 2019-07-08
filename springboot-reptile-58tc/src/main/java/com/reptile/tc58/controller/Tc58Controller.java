@@ -34,6 +34,7 @@ public class Tc58Controller {
 		
 //		Document doc = (Document) Jsoup.connect("https://www.lagou.com/"+url).get();
 		
+		long start = System.currentTimeMillis();
 		
 		//获取用户代理，浏览器标识，以防止被网站屏蔽ip或者要求验证码
 		String user_agent = HttpClientUtil.getAgentID();
@@ -55,6 +56,10 @@ public class Tc58Controller {
 					IOUtil.StringBufferedOutPutFile(results, "E:\\58tc.html");
 					//业务层爬去页面职位数据
 					List<Job> jobList = tcservice.getJobList(results);
+					
+					long end = System.currentTimeMillis();
+
+					LOG.info("本次58同城后端处理时间: "+(end-start)+" ms");
 					
 					return jobList;
 				}

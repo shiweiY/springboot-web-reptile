@@ -116,7 +116,7 @@ $(document).ready(function() {
 			}
 		});
 		
-		if($(activeTag).text() == "1"){
+		if(Number($(activeTag).text()) < 2){
 			return;
 		}
 		
@@ -133,20 +133,20 @@ $(document).ready(function() {
 			changeJobData(showid,cachekey,num);
 		}else{
 			server_page = Number(server_page)-1;
-			if(server_page == 1){
+			if(server_page == 1 || server_page < 0){
 				server_page = "";
 			}
 			$('#jobbox').data(showid+'-server-page',server_page);
 			
 			cachekey = showid+"JobArray"+server_page;
 			
-			var joblist = $('#'+showid).data(cachekey);
-			changeJobData(showid,cachekey,1);
+//			var joblist = $('#'+showid).data(cachekey);
+			var joblist = changeJobData(showid,cachekey,1);
 			readyLeftPaginationSearch();
 			
 			var prevpn = $('#jobbox').data(showid+"_prevpn");
-			var endpn = joblist.length / 10;
-			var startpn = Number(prevpn)-3;
+			var endpn = parseInt(joblist.length / 10);//Math.floor(x)
+			var startpn = Number(prevpn)-endpn;
 			
 			//更新下方页码
 			paginationAppend(startpn,endpn);
