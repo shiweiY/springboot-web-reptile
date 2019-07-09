@@ -2,7 +2,7 @@ package com.reptile.proup.model;
 
 import java.util.List;
 
-public class Company {
+public class TC58Company {
 	private String sortid;
 	private String name;	
 	private String link;	
@@ -55,14 +55,14 @@ public class Company {
 //		this.scale = scale;
 //	}
 	
-	public Company(String sortid, String name,String link, List<String> otherInfo) {
+	public TC58Company(String sortid, String name,String link, List<String> otherInfo) {
 		super();
 		this.sortid = sortid;
 		this.name = name;
 		this.link = link;
 		this.otherInfo = otherInfo;
 	}
-	public Company() {
+	public TC58Company() {
 		super();
 	}
 	

@@ -1,6 +1,7 @@
 package com.reptile.proup.test;
 
-import com.reptile.proup.model.Company;
+import com.reptile.proup.model.Job;
+import com.reptile.proup.model.TC58Company;
 import com.reptile.proup.model.TC58Job;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,11 +38,13 @@ public class FileReptileForThreadTest {
 //
 //            System.out.println("test");
 
+            long allstart = System.currentTimeMillis();
+            
             //职位信息所在的ul
-            Elements list_con = doc.select("#list_con");
-            Elements jobs_li = list_con.select(".job_item");//职位信息的li标签的所有集合
+//            Elements list_con = doc.select("#list_con");
+            Elements jobs_li = doc.getElementsByClass("job_item");//职位信息的li标签的所有集合
 
-            ExecutorService executepool = Executors.newCachedThreadPool();
+//            ExecutorService executepool = Executors.newCachedThreadPool();
 //
 //            Future<Map<String,TC58Job>> jobInfoResult = executepool.submit(new Callable<Map<String,TC58Job>>() {
 //                @Override
@@ -50,30 +53,42 @@ public class FileReptileForThreadTest {
 //                }
 //            });
             
-            Future<Map<String,Company>> comInfoResult = executepool.submit(new Callable<Map<String,Company>>() {
-                @Override
-                public Map<String,Company> call() throws Exception {
-                    return getComInfo(jobs_li);
-                }
-            });
-            
-            executepool.shutdown();
             
             
-            Map<String, Company> cpaResult = comInfoResult.get();
+//            Future<Map<String,TC58Company>> comInfoResult = executepool.submit(new Callable<Map<String,TC58Company>>() {
+//                @Override
+//                public Map<String,TC58Company> call() throws Exception {
+//                    return getComInfo(jobs_li);
+//                }
+//            });
+            
+//            executepool.shutdown();
+            
+            
             Map<String,TC58Job> jobResult = getJobInfo(jobs_li);
             
+            
+            Map<String, TC58Company> cpaResult = getComInfo(jobs_li);
+            long pend = System.currentTimeMillis();
+            
+            List<TC58Job> jobList = new ArrayList<>();
             for (Map.Entry<String, TC58Job> jobEntry : jobResult.entrySet()) {
 				
             	String sortIDkey = jobEntry.getKey();
+            	TC58Job job = jobEntry.getValue();
             	
-            	jobEntry.getValue().setCompany(cpaResult.get(sortIDkey));
+            	job.setCompany(cpaResult.get(sortIDkey));
+            	
+            	jobList.add(job);
             	
             	
 			}
+            long allend = System.currentTimeMillis();
             
-            System.out.println("...");
-            System.out.println("...");
+            
+            System.out.println("结果长度："+ jobList.size());
+            System.out.println("总爬取时间："+(pend-allstart));
+            System.out.println("总共爬取及组装时间："+(allend-allstart));
             System.out.println("...");
             System.out.println("...");
 
@@ -180,7 +195,7 @@ public class FileReptileForThreadTest {
     }
     
     
-    public static Map<String,Company> getComInfo(Elements jobs_li){
+    public static Map<String,TC58Company> getComInfo(Elements jobs_li){
     	 if(jobs_li == null || jobs_li.isEmpty()) {
              return null;
          }
@@ -190,7 +205,7 @@ public class FileReptileForThreadTest {
     	 String link = null;
     	 
     	  
-         Map<String,Company> resultMap = new HashMap<>();
+         Map<String,TC58Company> resultMap = new HashMap<>();
          
          int i=0;
          for (Element element : jobs_li) {
@@ -210,7 +225,7 @@ public class FileReptileForThreadTest {
         	 name = companyALink.text();
         	 link = companyALink.attr("href");
         	 
-        	 Company cpa = new Company();
+        	 TC58Company cpa = new TC58Company();
         	 cpa.setSortid(sortid);
         	 cpa.setName(name);
         	 cpa.setLink(link);

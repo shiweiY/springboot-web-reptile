@@ -12,14 +12,14 @@ public class TC58Job {
 	private String job_time;//发布时间
 	private String job_link;//原网页链接
 	private List<String> wel;//福利待遇
-	private Company company;//公司信息
+	private TC58Company company;//公司信息
 	
 	
-	public Company getCompany() {
+	public TC58Company getCompany() {
 		return company;
 	}
 
-	public void setCompany(Company company) {
+	public void setCompany(TC58Company company) {
 		this.company = company;
 	}
 
@@ -100,7 +100,7 @@ public class TC58Job {
 	}
 
 	public TC58Job(String sortid, String title, String salary, String address, String exp, String degree,
-			String job_time, String job_link, List<String> wel, Company company) {
+			String job_time, String job_link, List<String> wel, TC58Company company) {
 		super();
 		this.sortid = sortid;
 		this.title = title;

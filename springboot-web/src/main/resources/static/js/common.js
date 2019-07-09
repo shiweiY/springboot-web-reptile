@@ -16,7 +16,7 @@ var mpath = "/web/controller";
  */
 function jobSearch(){
 
-	var searchId = new Array("boss");
+	var searchId = new Array("boss","tc58");
 	
 	var timestart=new Date().getTime();
 	
@@ -39,11 +39,16 @@ function jobSearch(){
 			$("#boxinfo").attr({"pn":"1","show":id,"cachekey":id+"JobArray"})//当前显示数据的信息
 			//初始化下方页码
 			initPagination(joblist.length);
-		}
+		} 
 		
 		if(joblist != null && joblist.length > 0 ){
 			setJobData(id,id+"JobArray",joblist);
 			$('#jobbox').data(id+"-server-page","");//源页面的页码 比如boss直聘
+		}else{
+			$('#'+id).data(id,null);
+			$("#"+id).empty();
+			$("#"+id).append("<div class=\"alert alert-danger\">无数据！</div>");
+			$("#pagination").empty();
 		}
 		
 		
