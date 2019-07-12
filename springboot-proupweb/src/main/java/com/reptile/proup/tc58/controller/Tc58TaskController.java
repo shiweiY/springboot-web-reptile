@@ -43,6 +43,7 @@ public class Tc58TaskController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Tc58TaskController.class);
 
+	private static final String URLTMP = "https://bj.58.com/job/";
 	private static final String CITYPAGEURL = "https://www.58.com/changecity.html";
 
 	private static CloseableHttpClient CLIENT = HttpClients.createDefault();
@@ -81,6 +82,36 @@ public class Tc58TaskController {
 			LOG.info("58同城  城市信息时出现异常！");
 		}
 
+	}
+
+	@GetMapping(value = "/updateQueryParamsMapping")
+	public void updateQueryParamsMapping(){
+        try {
+            URIBuilder ubuilder = new URIBuilder(CITYPAGEURL);
+
+            URI uri = ubuilder.build();
+            HttpGet doGet = new HttpGet(uri);
+
+            CloseableHttpResponse response = CLIENT.execute(doGet);
+
+            if(response.getStatusLine().getStatusCode() == 200){
+                String result = EntityUtils.toString(response.getEntity(),"UTF-8");
+
+//                IOUtil.StringBufferedOutPutFile(result, "E://reptile/tc58UpdateCity.html");
+                //				boolean flag = tc58service.cityInfoUpdate(result);
+                boolean flag = tc58service.cityInfoUpdate(result);
+
+                if(flag){
+                    LOG.info("58同城  城市信息更新成功！");
+                }else{
+                    LOG.error("58同城  城市信息时出现异常！");
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.info("58同城  城市信息时出现异常！");
+        }
 	}
 
 

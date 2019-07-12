@@ -22,7 +22,7 @@ public class HttpClientUtil {
 
 	/**
 	 * http get请求
-	 * @param uriget
+	 * @param url
 	 * @return CloseableHttpResponse response
 	 * @throws Exception
 	 */
@@ -52,15 +52,20 @@ public class HttpClientUtil {
 	 */
 
 	public static List<Header> getListGETHeader(String uri,String user_agent) {
+		uri = uri.replaceAll("https://", "");
+		int idx1 = uri.indexOf("/job");
+		String HOST = uri.substring(0, idx1);
+		
 		List<Header> lheader = new ArrayList<Header>();
 		
 		lheader.add(new BasicHeader(HttpHeaders.ACCEPT,"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"));
 		lheader.add(new BasicHeader(HttpHeaders.ACCEPT_ENCODING,"gzip, deflate, br"));
 		lheader.add(new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE,"zh-CN,zh;q=0.9"));
-		lheader.add(new BasicHeader(HttpHeaders.CACHE_CONTROL,"max-age=0"));
+		lheader.add(new BasicHeader(HttpHeaders.CACHE_CONTROL,"no-cache"));
 		lheader.add(new BasicHeader(HttpHeaders.CONNECTION,"keep-alive"));
-		lheader.add(new BasicHeader(HttpHeaders.HOST,"bj.58.com"));
-		lheader.add(new BasicHeader(HttpHeaders.REFERER,uri));
+		lheader.add(new BasicHeader(HttpHeaders.HOST,HOST));
+		lheader.add(new BasicHeader(HttpHeaders.PRAGMA,"no-cache"));
+//		lheader.add(new BasicHeader(HttpHeaders.REFERER,uri));
 		lheader.add(new BasicHeader("Upgrade-Insecure-Requests","1"));
 //		lheader.add(new BasicHeader(HttpHeaders.SERVER,"nfs/1.0.0.2"));
 //		lheader.add(new BasicHeader(HttpHeaders.TRANSFER_ENCODING,"chunked"));

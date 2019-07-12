@@ -16,7 +16,7 @@ var mpath = "/web/controller";
  */
 function jobSearch(){
 
-	var searchId = new Array("boss","tc58");
+	var searchId = new Array("tc58");
 	
 	var timestart=new Date().getTime();
 	
@@ -202,6 +202,7 @@ function jobDomAppend(joblist,divid,pagenum){
 
 }
 
+//  . . . 按钮查询
 function paginationSearch(){
 	
 	var showid = $("#boxinfo").attr("show");
@@ -231,42 +232,6 @@ function paginationSearch(){
 	}else{
 		$("#jobbox").append("<div class=\"alert alert-danger\">未能正常查询出数据！</div>");
 	}
-//	
-//	
-//	$.ajax({
-//		type:"get",
-//		url:"/web/main/SingleSearchJob",
-//		data:params,
-//		dataType:"json",
-//		async:false,
-//		success:function(data){
-//
-//			if(data.flag == false){
-//				//显示错误讯息
-//				$("#jobbox").append("<div class=\"alert alert-danger\">"+data.message+"</div>");
-//				return;
-//			}
-//
-//			
-//			if(showid == "boss"){
-//				joblist = data.mapData.bossJobArray;
-//			}else if(showid == "tc58"){
-//				joblist = data.mapData.tc58JobArray;
-//			}
-//			
-//
-//			if(joblist != null && joblist.length > 0 ){
-//				$('#'+showid).data(cachekey,joblist);
-//				
-////				var pn = $("#boxinfo").attr("pn");
-//				changeJobData(showid,cachekey,"1");
-//				$('#jobbox').data(showid+'-server-page',params.page);//源页面页码 比如boss直聘
-//			}else{
-//				$("#jobbox").append("<div class=\"alert alert-danger\">未能正常查询出数据！</div>");
-//			}
-//		}
-//
-//	});
 	
 	var startpn = Number(prevpn)+1;
 	var endpn = joblist.length / 10;

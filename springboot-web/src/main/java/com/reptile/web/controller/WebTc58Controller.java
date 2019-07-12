@@ -29,6 +29,7 @@ import com.reptile.web.tech.cache.service.RedisHelper;
 class WebTc58Controller{
 
 	private static final Logger log = LoggerFactory.getLogger(WebTc58Controller.class);
+	private static final String URLTMP = "https://city.58.com/job/";
 
 //
 	@Autowired
@@ -46,8 +47,7 @@ class WebTc58Controller{
 		String showid = request.getParameter("showid");
 		String page = request.getParameter("page");//源页面页码
 		
-//		String url  = bossParamsHandle(request);
-		String url  = "";
+		String url  = tc58ParamsHandle(request);
 		
 		JSONReturn Jmodel =new JSONReturn();
 
@@ -95,7 +95,9 @@ class WebTc58Controller{
 	 * @param request
 	 * @return String
 	 */
-	public String bossParamsHandle(HttpServletRequest request){
+	public String tc58ParamsHandle(HttpServletRequest request){
+
+		StringBuffer surl = new StringBuffer(URLTMP);
 
 		try {
 			String query = request.getParameter("query");//职位名称
@@ -105,91 +107,81 @@ class WebTc58Controller{
 			String salary = request.getParameter("salary");//薪资
 			String stage = request.getParameter("stage");//融资阶段
 			String scale = request.getParameter("scale");//公司规模
-			String page = request.getParameter("page");//源页面页码
+			String pagenum = request.getParameter("page");//源页面页码
 
-			String surl = "";
+			Map<String,String>  params = new HashMap<>();
 
-			Map<String,String >  params = new HashMap<>();
-
-			//y_4-d_203-e_104-s_301-t_804/
-			if(salary != null && (salary.indexOf("all") == -1)){
-				params.put("tablename", "salarymapped");//表名
-				params.put("where", "page_param=\'"+salary+"\'");//条件
-				params.put("value", "boss_salary_param");//想要查询的结果
-				String salary_path = brmapper.selectTableOneValue(params);
-				surl += salary_path+"-";
-			}
-
-			if(degree != null && (degree.indexOf("all") == -1)){
-				params.put("tablename", "degreemapped");//表名
-				params.put("where", "page_param=\'"+degree+"\'");//where条件
-				params.put("value", "boss_degree_param");//需要查询出来的值
-				String degree_path = brmapper.selectTableOneValue(params);
-				surl += degree_path+"-";
-			}
-
-			//y_4-d_203-e_104-s_301-t_804/
-			if(exp != null && (exp.indexOf("all") == -1)){
-				params.put("tablename", "expmapped");//表
-				params.put("where", "page_param=\'"+exp+"\'");//where条件
-				params.put("value", "boss_exp_param");//需要查询出来的值
-				String exp_path = brmapper.selectTableOneValue(params);
-				surl += exp_path+"-";
-			}
-
-			if(scale != null && (scale.indexOf("all") == -1)){
-				params.put("tablename", "scalemapped");
-				params.put("where", "page_param=\'"+scale+"\'");
-				params.put("value", "boss_scale_param");
-				String scale_path = brmapper.selectTableOneValue(params);
-				surl += scale_path+"-";
-			}
-
-			//y_4-d_203-e_104-s_301-t_804/
-			if(stage != null && (stage.indexOf("all") == -1)){
-				params.put("tablename", "stagemapped");
-				params.put("where", "page_param=\'"+stage+"\'");
-				params.put("value", "boss_stage_param");
-				String stage_path = brmapper.selectTableOneValue(params);
-				surl += stage_path;
-			}
-
-
+			//https://bj.58.com/job/pn3
 			if(cityname != null && !cityname.isEmpty()){
 				params.put("tablename", "citymapped");//表格
 				params.put("where", "city_name=\'"+cityname+"\'");//where条件
-				params.put("value", "boss_city_param");//需要查询出来的值
-				String citypath = brmapper.selectTableOneValue(params);
-				surl = citypath+surl;
+				params.put("value", "tc58_city_param");//需要查询出来的值
+				cityname = brmapper.selectTableOneValue(params);
+				surl = surl.replace(8,12,cityname);
+			}else{
+				return null;
+			}
+			
+			//页码   https://bj.58.com/job/pn3
+			if(pagenum != null && !pagenum.isEmpty()){
+				surl.append("pn"+pagenum+"/");
 			}
 
-			//如果结尾有  - 符号 则 去除
-			if(surl.charAt(surl.length()-1) == '-' ){
-				surl = surl.substring(0, surl.length()-1);
+			boolean exp_degreeFlag = false;
+			//经验   https://bj.58.com/job/pve_5357_6/?key=java
+			if(exp != null && (exp.indexOf("all") == -1)){
+				params.put("tablename", "expmapped");//表
+				params.put("where", "page_param=\'"+exp+"\'");//where条件
+				params.put("value", "tc58_exp_param");//需要查询出来的值
+				String exp_path = brmapper.selectTableOneValue(params);
+				surl.append(exp_path);
+				exp_degreeFlag = true;
 			}
 
-			//要搜索的职位名称
-			if(query != null && !query.isEmpty()){
-				surl = surl+"?query="+filterChineseParams(query);
-			}
-
-			//第几页
-			if(page != null && !page.isEmpty()){
-				if(query != null && !query.isEmpty()){
-					surl = surl+"&page="+page;
+			//学历   https://bj.58.com/job/pve_5357_6_pve_5356_6/
+			if(degree != null && (degree.indexOf("all") == -1)){
+				params.put("tablename", "degreemapped");//表
+				params.put("where", "page_param=\'"+degree+"\'");//where条件
+				params.put("value", "tc58_degree_param");//需要查询出来的值
+				String degree_path = brmapper.selectTableOneValue(params);
+				if(exp_degreeFlag == true){
+					surl.append("_"+degree_path+"/");
 				}else{
-					surl = surl+"?page="+page;
+					surl.append(degree_path+"/");
 				}
 			}
+
+			surl.append("?");
+
+			//查询条件
+			if(query != null && !query.isEmpty()){
+				surl.append("key="+query);
+			}
+
+			//薪资
+			if(salary != null && (salary.indexOf("all") == -1)){
+				params.put("tablename", "salarymapped");//表名
+				params.put("where", "page_param=\'"+salary+"\'");//条件
+				params.put("value", "tc58_salary_param");//想要查询的结果
+				String salary_mp = brmapper.selectTableOneValue(params);
+				surl.append("minxinzi="+salary_mp);
+			}
+
+
+			if (surl.indexOf("?") != (surl.length()-1)){
+				surl.append("&");
+			}
+
+			surl.append("classpolicy=main_null,job_A&final=1&jump=1");
+
 			System.out.println("本次获取的url: "+surl);
 
-			return surl;
 		} catch (Throwable e) {
 			e.printStackTrace();
 			log.error("bossParamsHandle：  参数处理异常！");
 		}
 
-		return "";
+		return surl.toString();
 	}
 
 	/***
@@ -205,7 +197,6 @@ class WebTc58Controller{
 
 	/****
 	 * 将参数中的中文字符转码
-	 * @param value  参数
 	 * @return String 中文转码后的参数
 	 * @throws Throwable 
 	 */
