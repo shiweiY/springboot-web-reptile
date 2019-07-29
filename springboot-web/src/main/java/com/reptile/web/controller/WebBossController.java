@@ -1,6 +1,7 @@
 package com.reptile.web.controller;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,19 +25,13 @@ import com.reptile.web.service.FeignTc58Service;
 import com.reptile.web.tech.cache.service.RedisHelper;
 
 @RestController
-@RequestMapping("/main")
-class MainController{
+@RequestMapping("/web/controller/boss")
+class WebBossController{
 
-	private static final Logger log = LoggerFactory.getLogger(MainController.class);
+	private static final Logger log = LoggerFactory.getLogger(WebBossController.class);
 
 	@Autowired
 	FeignBossService boss_service;
-
-	@Autowired
-	FeignLagouService lagou_service;
-
-	@Autowired
-	FeignTc58Service tc58_service;
 
 	@Autowired
 	Main2RepositoryMapper brmapper;
@@ -45,57 +40,53 @@ class MainController{
 	//	@Autowired
 	//	RedisHelper redis;
 
-	//	static String url = "/c101010100/y_4-d_206-e_103/?ka=sel-salary-4";
-
 	@GetMapping("/searchJob")
-	public JSONReturn search(HttpServletRequest request){
+	public JSONReturn SingleSearch(HttpServletRequest request){
+		String showid = request.getParameter("showid");
+		String page = request.getParameter("page");//源页面页码
 
-		//拼接boss直聘查询的url
-		String bossurl = bossParamsHandle(request);
+		String url  = bossParamsHandle(request);
 
 		JSONReturn Jmodel =new JSONReturn();
 
 		long start = System.currentTimeMillis();
 
-		List<Object> bosslist = null;
+		List<Object> joblist = new ArrayList<Object>();
 
 		try{
 			//boss直聘查询
-			bosslist = boss_service.getBossPageJob(bossurl);
-			//			bosslist = lagou_service.getLagouPageJob("");
-			//			bosslist = tc58_service.get58TcPageJob("");
+			joblist = boss_service.getBossPageJob(url);
 
-
-
-			if(bosslist != null && !bosslist.isEmpty()) {
-
-				Map<String,Object> resultMap = new HashMap<>();
-				resultMap.put("list", bosslist);
-				Jmodel.setMapData(resultMap);
-				RedisHelper.setSerialData("boss_job_data", bosslist);
-				Jmodel.setFlag(true);
-
-				long end = System.currentTimeMillis();
-				double sum = (end - start) / 1000d;
-
-				Jmodel.setMessage("后端爬取及处理时间："+sum);
-			}else {
-				Jmodel.setFlag(false);
-				Jmodel.setMessage("未查询到数据，请切换条件重试或者联系管理员");
+			if(joblist == null){
+				joblist = new ArrayList<Object>();
 			}
+
+			Map<String,Object> resultMap = new HashMap<>();
+
+			resultMap.put("resultJobArray", joblist);
+			RedisHelper.setSerialData(showid+"JobArray"+page, joblist);//redis中存放所有查询过的数据
+
+			Jmodel.setMapData(resultMap);
+
+			Jmodel.setFlag(true);
+
+			long end = System.currentTimeMillis();
+
+			System.out.println("本次boss直聘后端处理时间: "+(end-start)+" ms");
 
 		}catch(Exception e){//查询数据异常时反馈给页面
 			e.printStackTrace();
 			log.error(e.getMessage());
 			Jmodel.setFlag(false);
-			Jmodel.setMessage("未查询到数据，请切换条件重试或者联系管理员");
+			Jmodel.setMessage("Boss直聘查询异常！！可能未查询出数据。");
 			return Jmodel;
 		}
 
-		//		List<Object> list2 = (List<Object>) RedisHelper.getSerialData("boss_job_data");
-
 		return Jmodel;
 	}
+
+
+
 
 	/***
 	 * 获取页面参数，最终返回拼接的url
@@ -112,7 +103,7 @@ class MainController{
 			String salary = request.getParameter("salary");//薪资
 			String stage = request.getParameter("stage");//融资阶段
 			String scale = request.getParameter("scale");//公司规模
-			String page = request.getParameter("page");//公司规模
+			String page = request.getParameter("page");//源页面页码
 
 			String surl = "";
 
@@ -188,14 +179,14 @@ class MainController{
 					surl = surl+"?page="+page;
 				}
 			}
-			System.out.println(surl);
-			
+			System.out.println("本次获取的url: "+surl);
+
 			return surl;
 		} catch (Throwable e) {
 			e.printStackTrace();
 			log.error("bossParamsHandle：  参数处理异常！");
 		}
-		
+
 		return "";
 	}
 

@@ -8,12 +8,12 @@ import java.util.regex.Pattern;
 
 public class test {
 	public static void main(String[] args) throws Throwable {
-		 String param = "java开发";
-		 
-		 String query = filterChineseParams(param);
-		 System.out.println(query);
+//		 String param = "java开发";
+//		 
+//		 String query = filterChineseParams(param);
+//		 System.out.println(query);
 
-       
+       System.out.println(25%10);
 
 	}
 	

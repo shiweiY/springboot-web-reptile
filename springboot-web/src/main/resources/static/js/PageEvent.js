@@ -39,13 +39,29 @@ $(document).ready(function() {
 	$("#affixul").on("click","a",function(){
 
 		//动态切换点击时候的显示状态
-		changeActive(this,"affixul")
+		changeActive(this,"affixul");
+		
+		var showid = $(this).attr("servername");
+		var server_page = $('#jobbox').data(showid+'-server-page');
+		var cachekey = showid+"JobArray"+server_page;
+		
+		changeShowBox(showid);
 		
 		//调用方法切换右方的数据显示
-		changeJobData(this.id,1,1);
+		var joblist = changeJobData(showid,cachekey,"1");
+		
+		var prevpn = $('#jobbox').data(showid+"_prevpn");
+		if(prevpn == undefined)
+			prevpn = 0 ;
+		
+		var startpn = Number(prevpn)+1;
+		var endpn = joblist.length / 10;
+		
+		//更新下方页码
+		paginationAppend(startpn,endpn);
 
 	});
-
+	
 	
 	/**
 	 * 页面下方分页按钮点击函数
@@ -54,99 +70,16 @@ $(document).ready(function() {
 		
 		//动态切换点击时候的显示状态
 		changeActive(this,"pagination");
-
-		//点击的数据页码
-		var num = $(this).attr("datanum");
 		
-		//左侧导航栏位选中的数据方
-		var idkey = "";
-		$("a[name='left_affix']").each(function(i,ele){
-			if($(this).parent().hasClass("active")){
-				idkey = this.id;
-			}
-		});
-		
-		var pageNum = $("#pagination").attr("pagenum");
-		$("#pagination").attr("datanum",num)
+		//页面正在显示的div,也是jquery.data()和redis中的的key
+		var showid = $("#boxinfo").attr("show");
+		//数据key
+		var server_page = $('#jobbox').data(showid+'-server-page');
+		var cachekey = showid+"JobArray"+server_page;
+		var pagenum = $(this).attr("apn");//点选的页码
 		
 		//切换分页数据
-		changeJobData(idkey,num,pageNum);
-		
-		$("#pagination_a_"+num).parent().addClass("active");//选中当前页
-		
-	});
-	
-	
-	//分页栏位 左箭头 按钮
-	$("#pagination").on("click","#pagination_left",function(){
-		var pageNum = $("#pagination").attr("pagenum");
-		var dnum = $("#pagination").attr("datanum");//选中元素的页码值
-		
-		if(Number(dnum) ==1 && Number(pageNum) == 1){//第一大页第一页数据  点击  << 无效
-			return;
-		}
-		var activeTag = $("#pagination").children(".active");//当前选中的元素
-		var prevTag = $(activeTag).prev().children().first();
-		if($(prevTag).attr("id") == "pagination_left"){
-			
-			jobSearch(Number(pageNum)-1);
-			return;
-		}
-		
-		var num = Number(dnum) - 1;//向左翻页后的页码
-		
-		//左侧导航栏位选中的数据方
-		var idkey = "";
-		$("a[name='left_affix']").each(function(i,ele){
-			if($(this).parent().hasClass("active")){
-				idkey = this.id;
-			}
-		});
-		
-		$(activeTag).removeClass();//移出本元素的选中状态
-		var lt = $(activeTag).prev();//前一个元素
-		$(lt).addClass("active");//使前一个元素选中
-		
-		//切换分页数据
-		changeJobData(idkey,num,pageNum);
-		
-		$("#pagination").attr("datanum",num)
-		
-		$("#pagination_a_"+num).parent().addClass("active");//选中当前页
-		
-	});
-	//分页栏位 右箭头 按钮
-	$("#pagination").on("click","#pagination_right",function(){
-		var pageNum = $("#pagination").attr("pagenum");//当前Redis中的数据页
-		
-		var activeTag = $("#pagination").children(".active");//当前选中的元素
-		var nextTag = $(activeTag).next().children().first();
-		if($(nextTag).attr("id") == "pagination_m"){
-			
-			jobSearch(Number(pageNum)+1);
-			return;
-		}
-		
-		var dnum = $("#pagination").attr("datanum");//选中元素的页码值
-		var num = Number(dnum) + 1;//向左翻页后的页码
-		
-		//左侧导航栏位选中的数据方
-		var idkey = "";
-		$("a[name='left_affix']").each(function(i,ele){
-			if($(this).parent().hasClass("active")){
-				idkey = this.id;
-			}
-		});
-		
-		$(activeTag).removeClass();//移除本元素的选中状态
-		var nt = $(activeTag).next();//前一个元素
-		$(nt).addClass("active");//使前一个元素选中
-		
-		//切换分页数据
-		changeJobData(idkey,num,pageNum);
-		
-		$("#pagination").attr("datanum",num);
-		$("#pagination_a_"+num).parent().addClass("active");//选中当前页
+		changeJobData(showid,cachekey,pagenum);
 		
 	});
 	
@@ -154,33 +87,108 @@ $(document).ready(function() {
 	 * 页面下方分页按钮点击函数
 	 */
 	$("#pagination").on("click","#pagination_m",function(){
-		var pageNum = $("#pagination").attr("pagenum");
-		jobSearch(Number(pageNum)+1);
+		readyRightPaginationSearch();
+		paginationSearch();
+	});
+	
+	function readyRightPaginationSearch(){
+		var showid = $("#boxinfo").attr("show");
+		var prevpn = $("a[name='pagination_a']").last().text();
+		$('#jobbox').data(showid+"_prevpn",prevpn);//  boss_prevpn
+	}
+	function readyLeftPaginationSearch(){
+		var showid = $("#boxinfo").attr("show");
+		var prevpn = $("a[name='pagination_a']").first().text();
+		$('#jobbox').data(showid+"_prevpn",prevpn);//  boss_prevpn
+	}
+	
+	
+	//分页栏位 左箭头 按钮 
+	$("#pagination").on("click","#pagination_left",function(){
+
+		var pagenum = $("#boxinfo").attr("pn");//当前显示的数据页码
+		
+		var activeTag;
+		$("a[name='pagination_a']").each(function(i,ele){
+			if($(this).parent().hasClass("active")){
+				activeTag = $(this);
+				return false;
+			}
+		});
+		
+		if(Number($(activeTag).text()) < 2){
+			return;
+		}
+		
+		var num = Number(pagenum) - 1;//向左翻页后的页码
+		
+		var showid = $("#boxinfo").attr("show");
+		var server_page = $('#jobbox').data(showid+'-server-page');
+		var cachekey = showid+"JobArray"+server_page;
+		
+		if($(activeTag).parent().prev().attr("id") != "pagination_left_li"){
+			$(activeTag).parent().removeClass();//移出本元素的选中状态
+			$(activeTag).parent().prev().addClass("active");//使前一个元素选中;
+			//切换分页数据
+			changeJobData(showid,cachekey,num);
+		}else{
+			server_page = Number(server_page)-1;
+			if(server_page == 1 || server_page < 0){
+				server_page = "";
+			}
+			$('#jobbox').data(showid+'-server-page',server_page);
+			
+			cachekey = showid+"JobArray"+server_page;
+			
+//			var joblist = $('#'+showid).data(cachekey);
+			var joblist = changeJobData(showid,cachekey,1);
+			readyLeftPaginationSearch();
+			
+			var prevpn = $('#jobbox').data(showid+"_prevpn");
+			var endpn = parseInt(joblist.length / 10);//Math.floor(x)
+			var startpn = Number(prevpn)-endpn;
+			
+			//更新下方页码
+			paginationAppend(startpn,endpn);
+		}
 		
 	});
+	
+	//分页栏位 右箭头 按钮
+	$("#pagination").on("click","#pagination_right",function(){
+		var pagenum = $("#boxinfo").attr("pn");//当前显示的数据页码
 
-
-//	//分页数据切换
-//	function fydata(obj,id){
-//		//动态切换点击时候的显示状态
-//		changeActive(obj,id);
-//
-//		//点击的页码
-//		var pageNum = $(obj).html();
-//		
-//		//左侧导航栏位选中的数据方
-//		var idkey = "";
-//		$("a[name='left_affix']").each(function(i,ele){
-//			if($(this).parent().hasClass("active")){
-//				idkey = this.id;
-//			}
-//		});
-//		
-//		//切换分页数据
-//		changeJobData(idkey,pageNum);
-//	}
-
-	//动态切换标签点击时候的显示状态
+		var num = Number(pagenum) + 1;//向右翻页后的页码
+		
+		var activeTag;
+		$("a[name='pagination_a']").each(function(i,ele){
+			if($(this).parent().hasClass("active")){
+				activeTag = $(this).parent();
+				return false;
+			}
+		});
+		
+		
+		var showid = $("#boxinfo").attr("show");
+		var server_page = $('#jobbox').data(showid+'-server-page');
+		var cachekey = showid+"JobArray"+server_page;
+		//判断下一个链接按钮是不是 ... 按钮
+		if($(activeTag).next().attr("id") != "pagination_m_li"){
+			$(activeTag).removeClass();//移出本元素的选中状态
+			$(activeTag).next().addClass("active");//使前一个元素选中;
+			
+			//切换分页数据
+			changeJobData(showid,cachekey,num);
+		}else{
+			readyRightPaginationSearch();
+			paginationSearch();
+		}
+		
+	});
+	
+	
+	
+	//动态切换标签点击时候的显示状态, 左侧导航和 下方 分页
 	function changeActive(obj,id){
 		var hasclass = $(obj).parent().hasClass("active");
 		if(hasclass == false){

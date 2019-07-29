@@ -7,109 +7,165 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.reptile.tc58.controller.Tc58Controller;
 import com.reptile.tc58.model.Company;
 import com.reptile.tc58.model.Job;
 import com.reptile.tc58.service.Tc58PageService;
-import com.thoughtworks.xstream.security.ForbiddenClassException;
 
 
 @Service("tcservice")
 public class Tc58PageServiceImpl implements Tc58PageService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(Tc58Controller.class);
+
 	public List<Job> getJobList(String pageDoc) {
-		Document doc = Jsoup.parse(pageDoc);
+		if(pageDoc == null || pageDoc.isEmpty())
+			return null;
 
-		//职位信息li节点集合				<li class="job_item clearfix">
-		Elements ele = doc.getElementsByClass("job_item");
-
-		List<String> sortidList = new ArrayList<>();
 		List<Job> jobList = new ArrayList<>();
+		int jnum = 0;//记录job第几条数据
+		int cnum = 0;//记录company第几条数据
+		try{
+			Document doc = Jsoup.parse(pageDoc);
 
-		for (Element element : ele) {
-			Job job = new Job();
 
-			//职位地址、名称等信息div
-			Element job_nameDiv = element.getElementsByClass("job_name").first();
-			String sortid = job_nameDiv.attr("sortid");//58同城页面每个职位外层div都有一个不重复的sortid
-			sortidList.add(sortid);
+			long start = System.currentTimeMillis();
+			//职位信息li节点集合				<li class="job_item clearfix">
+			Elements ele = doc.getElementsByClass("job_item");
 
-			String job_link = job_nameDiv.getElementsByTag("a").first().attr("href");
-			job.setJob_link(job_link);//原网页职位链接
+			List<String> sortidList = new ArrayList<>();
 
-			//职位地址 span节点			 <span class="address">萧山区 </span>
-			Element addressEle = element.getElementsByClass("address").first();
-			String address = addressEle.text();
-			job.setAddress(address);//职位地址
+			String sortid = null;
+			String jobAddress = null;
+			String jobName = null;
+			String jobSalary = null;
+			String xueli = null;
+			String jingyan = null;
+			String jobLink = null;
 
-			//职位名称span节点	名称可能未拼接方式显示页面或者直接显示
-			Element nameEle = element.getElementsByClass("name").first();
+			for (Element element : ele) {
+				Job job = new Job();
 
-			//			Elements b_tag = nameEle.getElementsByTag("b");
-			//			//此职位的职位名称为关键字拼接方式
-			//			if(b_tag != null && !b_tag.isEmpty()){
-			//				String jobname = "";
-			//				Element b_1 = b_tag.first();
-			//				jobname += b_1.text();
-			//
-			//				nameEle = nameEle.select("b").remove().first();
-			//				jobname += nameEle.text();
-			//
-			//				Element b_2 = b_tag.last();
-			//				if(b_2 != null){//存在第二个关键字
-			//					jobname += b_2.text();
-			//				}
-			//				job.setTitle(jobname);
-			//			}else{//非关键字拼接方式，直接拿职位名称span的值
-			job.setTitle(nameEle.text());
-			//			}
-			//薪资p节点
-			String job_salary = element.getElementsByClass("job_salary").first().text();
-			job.setSalary(job_salary);
+				//每个职位的唯一sortid
+				Elements sortidEles = element.getElementsByAttribute("sortid");
+				Element sortidDiv = sortidEles.first();
+				sortid = sortidDiv.attr("sortid");//58同城页面每个职位外层div都有一个不重复的sortid
+				sortidList.add(sortid);
 
-			String xueli = element.getElementsByClass("xueli").first().text();
-			String jingyan = element.getElementsByClass("jingyan").first().text();
-			String job_time = element.getElementsByClass("sign").first().text();
+				Elements linkEles = sortidDiv.getElementsByTag("a");
+				Element linkA = linkEles.first();
+				jobLink = (linkA == null) ? "职位链接地址暂无" : linkA.attr("href");
 
-			if(!"精准".equals(job_time)){//不为精准推广
-				job.setJob_time("发布于 "+job_time);
-			}
-			job.setDegree(xueli);
-			job.setExp(jingyan);
+				//<!-- > 职位信息节点<-->
+				Element job_title =  element.select(".job_title").first();
 
-			jobList.add(job);
-		}
+				//地址 address			 <span class="address">萧山区 </span>
+				Elements addressEles = job_title.getElementsByClass("address");
+				Element addressSpan = addressEles.first();
+				jobAddress = (addressSpan == null ? "无地址信息" : addressSpan.html());
 
-		List<Company> cpanyList = new ArrayList<>();
-		for (Element element : ele) {
-			Company cpany = new Company();
-			//公司名称
-			String comp_name = element.getElementsByClass("fl").first().text();//公司名称
-			cpany.setName(comp_name);
 
-			List<String> otherInfo = new ArrayList<>();
-			//	58同城页面上方没有公司详细信息，将其他福利待遇信息放入
-			Element job_welDiv = element.getElementsByClass("job_wel").first();
-			if(job_welDiv != null){
-				Elements job_wel_span = job_welDiv.getElementsByTag("span");
-				for (Element span : job_wel_span) {
-					otherInfo.add(span.text());
+				//职位名称   name
+				Elements nameEles = job_title.getElementsByClass("name");
+				Element nameSpan = nameEles.first();
+				jobName = (nameSpan == null ? "无职位名称信息" : nameSpan.html());
+
+				//薪资 job_salary
+				Elements salaryEles = job_title.getElementsByClass("job_salary");
+				Element salaryP = salaryEles.first();
+				jobSalary = (salaryP == null ? "无薪资信息" : salaryP.text());
+
+
+				Elements job_requireEles = element.getElementsByClass("job_comp").first().getElementsByClass("job_require");
+				if(job_requireEles != null){
+					Element job_requireP = job_requireEles.first();
+
+					//学历
+					Elements xueliEles = job_requireP.getElementsByClass("xueli");
+					Element xueleSpan = xueliEles.first();
+					xueli = (xueleSpan == null ? "不限学历" : xueleSpan.text());
+
+					//经验
+					Elements jingyanEles = job_requireP.getElementsByClass("jingyan");
+					Element jingyanSpan = jingyanEles.first();
+					jingyan = (jingyanSpan == null ? "不限经验" : jingyanSpan.text());
 				}
-			}else{
-				otherInfo.add("暂无信息");
+
+				//			if(!"精准".equals(job_time)){//不为精准推广
+				//				job.setJob_time("发布于 "+job_time);
+				//			}
+
+				job.setSalary(jobSalary);
+				job.setTitle(jobName);
+				job.setAddress(jobAddress);//职位地址
+				job.setJob_link(jobLink);//原网页职位链接
+				job.setDegree(xueli);
+				job.setExp(jingyan);
+
+				jnum++;
+
+				jobList.add(job);
+
 			}
-			
-			cpany.setOtherInfo(otherInfo);
-			cpanyList.add(cpany);
+
+			jnum = 0;
+
+			String cpname = null;
+			String cplink = null;
+
+			List<Company> cpanyList = new ArrayList<>();
+			for (Element element : ele) {
+				Company cpany = new Company();
+				//公司名称
+				Elements companyELes = element.getElementsByClass("fl");
+				Element companyALink = companyELes.first();
+				cpname = companyALink.text();
+				cplink = companyALink.attr("href");
+
+				//待遇等信息
+				List<String> welList = new ArrayList<String>();
+				Elements job_welDivs = element.getElementsByClass("job_wel");
+				if(job_welDivs != null){
+					Element job_wel = job_welDivs.first();
+					if(job_wel != null){
+						Elements job_wel_span = job_wel.getElementsByTag("span");
+						for (Element span : job_wel_span) {
+							welList.add(span.text());
+						}
+					}
+				}else{
+					welList.add("暂无待遇信息");
+				}
+
+				cpany.setName(cpname);
+				cpany.setLink(cplink);
+				cpany.setOtherInfo(welList);
+				cpanyList.add(cpany);
+				cnum++;
+			}
+
+			for (int i = 0; i < jobList.size(); i++) {
+				jobList.get(i).setCompany(cpanyList.get(i));
+			}
+
+			cnum = 0;
+
+			long end = System.currentTimeMillis();
+
+			LOG.debug("本次解析时间：" + (end-start) + "ms");
+		}catch(Exception e){
+			String logerror = null;
+			if(jnum == 0)
+				logerror = "58同城 第"+cnum+"条company解析错误";
+			else
+				logerror = "58同城 第"+jnum+"条job解析错误";
+				LOG.error(logerror);
+			e.printStackTrace();
 		}
-
-		for (int i = 0; i < jobList.size(); i++) {
-			jobList.get(i).setCompany(cpanyList.get(i));
-		}
-
-
-
 
 		return jobList;
 	}
